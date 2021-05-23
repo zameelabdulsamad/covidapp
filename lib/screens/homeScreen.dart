@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:covidapp/constants.dart';
+import 'package:covidapp/screens/districtScreen.dart';
+import 'package:covidapp/screens/newsScreen.dart';
 import 'package:covidapp/widgets/linechart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -70,10 +72,12 @@ class HomeScreen extends StatelessWidget {
                       homeButton(
                         title: "Status",
                         buttonIcon: Icons.bar_chart,
+                        homeButtonPage: DistrictScreen(),
                       ),
                       homeButton(
                         title: "News",
                         buttonIcon: Icons.article,
+                        homeButtonPage: NewsScreen(),
                       ),
                       homeButton(
                         title: "Vaccination",
@@ -183,25 +187,35 @@ class HomeScreen extends StatelessWidget {
 class homeButton extends StatelessWidget {
   final String title;
   final IconData buttonIcon;
+  final Widget homeButtonPage;
 
   const homeButton({
     Key key,
     this.title,
-    this.buttonIcon,
+    this.buttonIcon, this.homeButtonPage,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(color: primaryRed, shape: BoxShape.circle),
-          child: Icon(
-            buttonIcon,
-            size: 36,
-            color: Colors.white,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => homeButtonPage),
+            );
+          },
+          child: Container(
+
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(color: primaryRed, shape: BoxShape.circle),
+            child: Icon(
+              buttonIcon,
+              size: 36,
+              color: Colors.white,
+            ),
           ),
         ),
         Padding(
