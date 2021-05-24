@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1007316061948",
+    "project_id": "covid-point",
+    "storage_bucket": "covid-point.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007316061948:android:d72d4e1e4cfedd0b8f1179",
+        "android_client_info": {
+          "package_name": "com.covidpoint.covidapp.covidapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007316061948-ggct8e58odecqhdbnv6i2ngpfp60sccs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAic7LSFOyFbfv1HnOJW59V53ekOOsOuvM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007316061948-ggct8e58odecqhdbnv6i2ngpfp60sccs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
