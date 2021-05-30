@@ -2,7 +2,11 @@ import 'dart:ui';
 
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/screens/districtScreen.dart';
+import 'package:covidapp/screens/indiaScreen.dart';
 import 'package:covidapp/screens/newsScreen.dart';
+import 'package:covidapp/screens/stateScreen.dart';
+import 'package:covidapp/screens/statusScreen.dart';
+import 'package:covidapp/screens/vaccinationScreen.dart';
 import 'package:covidapp/widgets/linechart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -78,22 +82,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       homeButton(
                         title: "Status",
                         buttonIcon: Icons.bar_chart,
-                        homeButtonPage: DistrictScreen(),
+                        homeButtonPage: StatusScreen(),
                       ),
                       homeButton(
                         title: "News",
                         buttonIcon: Icons.article,
-                        homeButtonPage: NewsScreen(),
+                        homeButtonPage: DistrictScreen(),
                       ),
                       homeButton(
                         title: "Vaccination",
                         buttonIcon: Icons.medical_services_rounded,
-                        homeButtonPage: NewsScreen(),
+                        homeButtonPage: IndiaScreen(),
 
                       ),
                       homeButton(
                         title: "Helpline",
                         buttonIcon: Icons.headset,
+                        homeButtonPage: StateScreen(),
+
                       ),
                     ],
                   ),

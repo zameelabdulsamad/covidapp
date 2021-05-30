@@ -26,15 +26,15 @@ class LineReportChart extends StatelessWidget {
 
   List<FlSpot> getSpots() {
     return [
-      FlSpot(0, .5),
-      FlSpot(1, 1.5),
-      FlSpot(2, .3),
-      FlSpot(3, 2.5),
-      FlSpot(4, 3.5),
-      FlSpot(5, 1.5),
-      FlSpot(6, 3.5),
-      FlSpot(7, 1.5),
-      FlSpot(8, .5),
+      FlSpot(0, 3500),
+      FlSpot(1, 3000),
+      FlSpot(2, 2200),
+      FlSpot(3, 1750),
+      FlSpot(4, 8000),
+      FlSpot(5, 8500),
+      FlSpot(6, 3200),
+      FlSpot(7, 2700),
+      FlSpot(8, 9000),
     ];
   }
 }
