@@ -11,6 +11,8 @@ import 'package:covidapp/widgets/linechart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AdaptiveTextSize {
   const AdaptiveTextSize();
@@ -28,7 +30,53 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+List listResponse;
+Map mapResponse;
+
 class _HomeScreenState extends State<HomeScreen> {
+
+  bool download=false;
+
+
+  Future fetchData() async {
+    http.Response response;
+    var url =
+    Uri.parse("https://corona-virus-world-and-india-data.p.rapidapi.com/api_india_timeline");
+    response = await http.get(
+        url,
+        headers: {
+          "x-rapidapi-key": "3800574636msh050a9500bde3d58p1106fdjsn91a8dcd36014",
+          "x-rapidapi-host": "corona-virus-world-and-india-data.p.rapidapi.com",
+        });
+    if (response.statusCode == 200) {
+      setState(() {
+        listResponse = json.decode(response.body);
+
+      });
+    }
+  }
+  Future fetchData1() async {
+    http.Response response;
+    var url =
+    Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
+    response = await http.get(url);
+    if (response.statusCode == 200) {
+      print(response.statusCode);
+      setState(() {
+        mapResponse = json.decode(response.body);
+
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    fetchData();
+    fetchData1();
+    download=true;
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
 
 import '../constants.dart';
+import 'homeScreen.dart';
 class StateScreen extends StatefulWidget {
   const StateScreen({Key key}) : super(key: key);
 
@@ -16,7 +17,6 @@ class StateScreen extends StatefulWidget {
 
 class _StateScreenState extends State<StateScreen> {
 
-  Map mapResponse;
   String kerl="KL";
 
   String formatDate() {
@@ -28,24 +28,7 @@ class _StateScreenState extends State<StateScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  Future fetchData() async {
-    http.Response response;
-    var url =
-    Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
-    response = await http.get(url);
-    if (response.statusCode == 200) {
-      setState(() {
-        mapResponse = json.decode(response.body);
-      });
-    }
-  }
 
-  @override
-  void initState() {
-    fetchData();
-    // TODO: implement initState
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
