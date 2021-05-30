@@ -61,9 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
     Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
     response = await http.get(url);
     if (response.statusCode == 200) {
-      print(response.statusCode);
+
       setState(() {
         mapResponse = json.decode(response.body);
+        print(mapResponse['2021-05-29']['KL']
+        ['districts']);
 
       });
     }

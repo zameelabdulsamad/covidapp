@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:covidapp/districtList.dart';
+import 'package:covidapp/screens/districtScreen.dart';
+import 'package:covidapp/statesList.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -9,15 +12,128 @@ import 'package:table_calendar/table_calendar.dart';
 import '../constants.dart';
 import 'homeScreen.dart';
 class StateScreen extends StatefulWidget {
-  const StateScreen({Key key}) : super(key: key);
+  final StateList state;
+  const StateScreen({Key key, this.state}) : super(key: key);
 
   @override
   _StateScreenState createState() => _StateScreenState();
 }
 
 class _StateScreenState extends State<StateScreen> {
+  List<String> getDistrictList(){
+    if(widget.state.stateCode=="AN"){
+      return ANList;
 
-  String kerl="KL";
+    }
+    else if(widget.state.stateCode=="AP"){
+      return APList;
+    }
+    else if(widget.state.stateCode=="AR"){
+      return ARList;
+    }
+    else if(widget.state.stateCode=="AS"){
+      return ASList;
+    }
+    else if(widget.state.stateCode=="BR"){
+      return BRList;
+    }
+    else if(widget.state.stateCode=="CH"){
+      return CHList;
+    }
+    else if(widget.state.stateCode=="CT"){
+      return CTList;
+    }
+    else if(widget.state.stateCode=="DL"){
+      return DLList;
+    }
+    else if(widget.state.stateCode=="DN"){
+      return DNList;
+    }
+    else if(widget.state.stateCode=="GA"){
+      return GAList;
+    }
+    else if(widget.state.stateCode=="GJ"){
+      return GJList;
+    }
+    else if(widget.state.stateCode=="HP"){
+      return HPList;
+    }
+    else if(widget.state.stateCode=="HR"){
+      return HRList;
+    }
+    else if(widget.state.stateCode=="JH"){
+      return JHList;
+    }
+    else if(widget.state.stateCode=="JK"){
+      return JKList;
+    }
+    else if(widget.state.stateCode=="KA"){
+      return KAList;
+    }
+    else if(widget.state.stateCode=="KL"){
+      return KLList;
+    }
+    else if(widget.state.stateCode=="LA"){
+      return LAList;
+    }
+    else if(widget.state.stateCode=="LD"){
+      return LDList;
+    }
+    else if(widget.state.stateCode=="MH"){
+      return MHList;
+    }
+    else if(widget.state.stateCode=="ML"){
+      return MLList;
+    }
+    else if(widget.state.stateCode=="MN"){
+      return MNList;
+    }
+    else if(widget.state.stateCode=="MP"){
+      return MPList;
+    }
+    else if(widget.state.stateCode=="MZ"){
+      return MZList;
+    }
+    else if(widget.state.stateCode=="NL"){
+      return NLList;
+    }
+    else if(widget.state.stateCode=="OR"){
+      return ORList;
+    }
+    else if(widget.state.stateCode=="PB"){
+      return PBList;
+    }
+    else if(widget.state.stateCode=="PY"){
+      return PYList;
+    }
+    else if(widget.state.stateCode=="RJ"){
+      return RJList;
+    }
+    else if(widget.state.stateCode=="SK"){
+      return SKList;
+    }
+    else if(widget.state.stateCode=="TG"){
+      return TGList;
+    }
+    else if(widget.state.stateCode=="TN"){
+      return TNList;
+    }
+    else if(widget.state.stateCode=="TR"){
+      return TRList;
+    }
+    else if(widget.state.stateCode=="UP"){
+      return UPList;
+    }
+    else if(widget.state.stateCode=="UT"){
+      return UTList;
+    }
+    else if(widget.state.stateCode=="WB"){
+      return WBList;
+    }
+  }
+
+
+
 
   String formatDate() {
     var outFormatter = new DateFormat('yyyy-MM-dd');
@@ -35,7 +151,7 @@ class _StateScreenState extends State<StateScreen> {
         appBar: AppBar(
         backgroundColor: bgGrey,
         elevation: 0,
-        title: Text("Kerala"),
+        title: Text(widget.state.stateName),
     ),
       body: SingleChildScrollView(
         child: Column(
@@ -97,7 +213,7 @@ class _StateScreenState extends State<StateScreen> {
                         mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: cardYellow,
-                        state: kerl,
+                        state: widget.state.stateCode,
                         txHeading: "CONFIRMED",
                         item: "confirmed",
                         currentDate: _selectedDay,),
@@ -105,7 +221,7 @@ class _StateScreenState extends State<StateScreen> {
                         mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: cardGreen,
-                        state: kerl,
+                        state: widget.state.stateCode,
                         txHeading: "RECOVERED",
                         item: "recovered",
                         currentDate: _selectedDay,),
@@ -113,7 +229,7 @@ class _StateScreenState extends State<StateScreen> {
                         mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: primaryRed,
-                        state: kerl,
+                        state: widget.state.stateCode,
                         txHeading: "DECEASED",
                         item: "deceased",
                         currentDate: _selectedDay,),
@@ -122,7 +238,43 @@ class _StateScreenState extends State<StateScreen> {
                   ),
                 ),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 16),
+              child: Container(
+                  width: double.infinity,
+                  height: 2000,
+
+
+                  decoration: BoxDecoration(
+                    color: bgGrey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: new ListView.builder
+                    (
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: getDistrictList().length,
+
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: new StateCard(date: formatDate(),
+                            mapResponse: mapResponse,
+                            state: widget.state.stateCode,
+                            district: getDistrictList()[index],
+                            onTap: (){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DistrictScreen(state: widget.state.stateCode,district: getDistrictList()[index],)));},
+
+                            item: getDistrictList()[index],),
+                        );
+                      }
+                  )
+
+              ),
+            ),
 
 
           ],
@@ -130,7 +282,110 @@ class _StateScreenState extends State<StateScreen> {
       ),
     );
   }
+
 }
+
+
+class StateCard extends StatelessWidget {
+
+
+  final String district;
+  final String state;
+  final VoidCallback onTap;
+  final String item;
+  final bool selected;
+  final String date;
+  final Map mapResponse;
+  const StateCard({Key key, this.district, this.onTap, this.item, this.selected, this.date, this.mapResponse, this.state}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.display1;
+    // if (selected)
+    //   textStyle = textStyle.copyWith(color: Colors.lightGreenAccent[400]);
+    return InkWell(
+      onTap: () {
+        onTap();
+      },
+      child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: bgWhite,
+            borderRadius: BorderRadius.circular(8),
+
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+
+              children: <Widget>[
+
+                Text(
+                  district,
+                  style: null,
+                  textAlign: TextAlign.left,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      itemNumber().toString(),
+                      style: null,
+                      textAlign: TextAlign.left,
+                    ),
+                    Icon(Icons.arrow_forward_ios,color: primaryRed,size: 16,)
+
+                  ],
+                )
+
+
+
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          )),
+    );
+  }
+
+  String itemNumber() {
+    if(mapResponse==null)
+      return 0.toString();
+    else if(mapResponse['$date']==null){
+      return 0.toString();
+    }
+    else if(mapResponse['$date']['$state']
+        ==null){
+      return 0.toString();
+    }
+    else if(mapResponse['$date']['$state']
+    ['districts']==null){
+      return 0.toString();
+    }
+    else if(mapResponse['$date']['$state']
+    ['districts']['$district']==null){
+      return 0.toString();
+    }
+    else if(mapResponse['$date']['$state']
+    ['districts']['$district']["delta"]==null){
+      return 0.toString();
+    }
+    else if(mapResponse['$date']['$state']
+    ['districts']['$district']["delta"]["confirmed"]==null){
+      return 0.toString();
+    }
+
+    else
+      return mapResponse['$date']['$state']
+      ['districts']['$district']["delta"]["confirmed"]
+          .toString();
+
+  }
+
+
+}
+
 
 class RowItem extends StatelessWidget {
   final Color txColor;
@@ -180,7 +435,7 @@ class RowItem extends StatelessWidget {
       return 0.toString();
     }
     else if(mapResponseInRow['$date']['$state']
-    ==null){
+        ==null){
       return 0.toString();
     }
     else if(mapResponseInRow['$date']['$state']
@@ -199,4 +454,3 @@ class RowItem extends StatelessWidget {
 
   }
 }
-

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 import '../constants.dart';
+import 'homeScreen.dart';
 
 class StatusScreen extends StatefulWidget {
   const StatusScreen({Key key}) : super(key: key);
@@ -15,7 +16,6 @@ class StatusScreen extends StatefulWidget {
 }
 
 class _StatusScreenState extends State<StatusScreen> {
-  Map mapResponse;
   String district = "Malappuram";
   String state = "KL";
   DateTime today = DateTime.now();
@@ -25,24 +25,7 @@ class _StatusScreenState extends State<StatusScreen> {
     return outFormatter.format(today);
   }
 
-  Future fetchData() async {
-    http.Response response;
-    var url =
-        Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
-    response = await http.get(url);
-    if (response.statusCode == 200) {
-      setState(() {
-        mapResponse = json.decode(response.body);
-      });
-    }
-  }
 
-  @override
-  void initState() {
-    fetchData();
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

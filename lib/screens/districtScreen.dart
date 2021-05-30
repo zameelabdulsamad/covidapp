@@ -9,15 +9,16 @@ import 'dart:convert';
 import 'homeScreen.dart';
 
 class DistrictScreen extends StatefulWidget {
-  const DistrictScreen({Key key}) : super(key: key);
+  final String district;
+  final String state;
+  const DistrictScreen({Key key, this.district, this.state}) : super(key: key);
 
   @override
   _DistrictScreenState createState() => _DistrictScreenState();
 }
 
 class _DistrictScreenState extends State<DistrictScreen> {
-  String malp = "Malappuram";
-  String kerl="KL";
+
 
   String formatDate() {
     var outFormatter = new DateFormat('yyyy-MM-dd');
@@ -38,7 +39,7 @@ class _DistrictScreenState extends State<DistrictScreen> {
       appBar: AppBar(
         backgroundColor: bgGrey,
         elevation: 0,
-        title: Text("Malappuram"),
+        title: Text(widget.district),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -83,34 +84,34 @@ class _DistrictScreenState extends State<DistrictScreen> {
               ),
             ),
             DataCard(
-              district: malp,
+              district: widget.district,
               mapResponseInCard: mapResponse,
               date: formatDate(),
               cardColor: cardYellow,
               graphColor: Color(0xFFC7971D),
-              state: kerl,
+              state: widget.state,
               cardHeading: "CONFIRMED CASES",
               item: "confirmed",
               currentDate: _selectedDay,
             ),
             DataCard(
-              district: malp,
+              district: widget.district,
               mapResponseInCard: mapResponse,
               date: formatDate(),
               cardColor: cardGreen,
               graphColor: Color(0xFF27905D),
-              state: kerl,
+              state: widget.state,
 
               cardHeading: "RECOVERED CASES",
               item: "recovered",
               currentDate: _selectedDay,
             ),
             DataCard(
-              district: malp,
+              district: widget.district,
               mapResponseInCard: mapResponse,
               date: formatDate(),
               graphColor: Color(0xFFA22C29),
-              state: kerl,
+              state: widget.state,
 
               cardColor: primaryRed,
               cardHeading: "DECEASED",
