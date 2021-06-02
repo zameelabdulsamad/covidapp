@@ -6,7 +6,10 @@ import 'package:covidapp/screens/indiaScreen.dart';
 import 'package:covidapp/screens/newsScreen.dart';
 import 'package:covidapp/screens/stateScreen.dart';
 import 'package:covidapp/screens/statusScreen.dart';
+import 'package:covidapp/screens/vaccinationIndiaScreen.dart';
 import 'package:covidapp/screens/vaccinationScreen.dart';
+import 'package:covidapp/screens/vaccinationStateScreen.dart';
+import 'package:covidapp/screens/worldWideScreen.dart';
 import 'package:covidapp/widgets/linechart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -31,7 +34,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 List listResponse;
+List WMapResponse;
+List WListResponse;
 Map mapResponse;
+
 
 class _HomeScreenState extends State<HomeScreen> {
 
@@ -39,42 +45,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   Future fetchData() async {
-    http.Response response;
-    var url =
+    http.Response response1;
+    var url1 =
     Uri.parse("https://corona-virus-world-and-india-data.p.rapidapi.com/api_india_timeline");
-    response = await http.get(
-        url,
+    response1 = await http.get(
+        url1,
         headers: {
           "x-rapidapi-key": "3800574636msh050a9500bde3d58p1106fdjsn91a8dcd36014",
           "x-rapidapi-host": "corona-virus-world-and-india-data.p.rapidapi.com",
         });
-    if (response.statusCode == 200) {
-      setState(() {
-        listResponse = json.decode(response.body);
-
-      });
-    }
-  }
-  Future fetchData1() async {
-    http.Response response;
-    var url =
+    http.Response response2;
+    var url2 =
+    Uri.parse("https://coronavirus-19-api.herokuapp.com/countries");
+    response2 = await http.get(url2);
+    http.Response response3;
+    var url3 =
     Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
-    response = await http.get(url);
-    if (response.statusCode == 200) {
+    response3 = await http.get(url3);
+    print(response1.statusCode);
+    print(response2.statusCode);
+    print(response3.statusCode);
+    if (response1.statusCode == 200 && response2.statusCode == 200 && response3.statusCode == 200) {
 
       setState(() {
-        mapResponse = json.decode(response.body);
-        print(mapResponse['2021-05-29']['KL']
-        ['districts']);
+        listResponse = json.decode(response1.body);
+        WMapResponse = json.decode(response2.body);
+        mapResponse = json.decode(response3.body);
+
+
 
       });
     }
   }
+
 
   @override
   void initState() {
     fetchData();
-    fetchData1();
+
     download=true;
     // TODO: implement initState
     super.initState();
@@ -132,23 +140,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       homeButton(
                         title: "Status",
                         buttonIcon: Icons.bar_chart,
-                        homeButtonPage: StatusScreen(),
+                        homeButtonPage: StatusScreen()
                       ),
                       homeButton(
                         title: "News",
                         buttonIcon: Icons.article,
-                        homeButtonPage: DistrictScreen(),
+                        homeButtonPage: VaccinationScreen(),
                       ),
                       homeButton(
                         title: "Vaccination",
                         buttonIcon: Icons.medical_services_rounded,
-                        homeButtonPage: IndiaScreen(),
+                        homeButtonPage: VaccinationScreen(),
 
                       ),
                       homeButton(
                         title: "Helpline",
                         buttonIcon: Icons.headset,
-                        homeButtonPage: StateScreen(),
+                        homeButtonPage: VaccinationIndiaScreen(),
 
                       ),
                     ],

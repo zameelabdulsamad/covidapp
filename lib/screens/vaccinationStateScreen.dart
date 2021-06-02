@@ -1,27 +1,24 @@
-import 'dart:convert';
-
+import 'package:covidapp/constants.dart';
 import 'package:covidapp/districtList.dart';
-import 'package:covidapp/screens/districtScreen.dart';
-import 'package:covidapp/statesList.dart';
+import 'package:covidapp/screens/homeScreen.dart';
+import 'package:covidapp/screens/vaccinationDistrictScreen.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:table_calendar/table_calendar.dart';
 
-import '../constants.dart';
-import 'homeScreen.dart';
-class StateScreen extends StatefulWidget {
+import 'districtScreen.dart';
+class VaccinationStateScreen extends StatefulWidget {
   final String stateName;
   final String stateCode;
 
-  const StateScreen({Key key,  this.stateName, this.stateCode}) : super(key: key);
+  const VaccinationStateScreen({Key key,  this.stateName, this.stateCode}) : super(key: key);
 
   @override
-  _StateScreenState createState() => _StateScreenState();
+  _VaccinationStateScreenState createState() => _VaccinationStateScreenState();
 }
 
-class _StateScreenState extends State<StateScreen> {
+class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
   List<String> getDistrictList(){
     if(widget.stateCode=="AN"){
       return ANList;
@@ -150,11 +147,11 @@ class _StateScreenState extends State<StateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: bgGrey,
         elevation: 0,
         title: Text(widget.stateName),
-    ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -197,50 +194,62 @@ class _StateScreenState extends State<StateScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 10,),
             Padding(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(left: 16,right: 16),
               child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: bgGrey,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 26,bottom: 26,left: 10,right: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                    children: [
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: cardYellow,
-                        state: widget.stateCode,
-                        txHeading: "CONFIRMED",
-                        item: "confirmed",
-                        currentDate: _selectedDay,),
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: cardGreen,
-                        state: widget.stateCode,
-                        txHeading: "RECOVERED",
-                        item: "recovered",
-                        currentDate: _selectedDay,),
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: primaryRed,
-                        state: widget.stateCode,
-                        txHeading: "DECEASED",
-                        item: "deceased",
-                        currentDate: _selectedDay,),
-
-                    ],
+                  decoration: BoxDecoration(
+                    color: bgGrey,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-              ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 16.0, left: 10, bottom: 20, right: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Total Vaccinated",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: primaryText),
+                                ),
+                                Text(
+                                  getTotalVAC(),
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: primaryText,
+                                  fontWeight: FontWeight.bold),
+
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Expanded(
+                          child: AspectRatio(
+                              aspectRatio: 2,
+                              child: StateChart(
+                                mapResponseInCard: mapResponse,
+                                state: widget.stateCode,
+                                dateInString: formatDate(),
+                                date: _selectedDay,
+                              )),
+                        ),
+                      ),
+                    ],
+                  )),
             ),
+
             Padding(
               padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 16),
               child: Container(
@@ -268,7 +277,9 @@ class _StateScreenState extends State<StateScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DistrictScreen(state: widget.stateCode,district: getDistrictList()[index],)));},
+                                      builder: (context) => VaccinationDistrictScreen(state: widget.stateCode,district: getDistrictList()[index],)));},
+
+
 
                             item: getDistrictList()[index],),
                         );
@@ -283,6 +294,35 @@ class _StateScreenState extends State<StateScreen> {
         ),
       ),
     );
+  }
+
+  String getTotalVAC() {
+
+     if(mapResponse
+        ==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+    ==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+    ["total"]==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+    ["total"]["vaccinated"]==null){
+      return 0.toString();
+    }
+
+    else
+      return mapResponse['${formatDate()}']['${widget.stateCode}']
+      ["total"]["vaccinated"]
+          .toString();
+
   }
 
 }
@@ -339,6 +379,7 @@ class StateCard extends StatelessWidget {
                     ),
                     Icon(Icons.arrow_forward_ios,color: primaryRed,size: 16,)
 
+
                   ],
                 )
 
@@ -370,17 +411,17 @@ class StateCard extends StatelessWidget {
       return 0.toString();
     }
     else if(mapResponse['$date']['$state']
-    ['districts']['$district']["delta"]==null){
+    ['districts']['$district']["total"]==null){
       return 0.toString();
     }
     else if(mapResponse['$date']['$state']
-    ['districts']['$district']["delta"]["confirmed"]==null){
+    ['districts']['$district']["total"]["vaccinated"]==null){
       return 0.toString();
     }
 
     else
       return mapResponse['$date']['$state']
-      ['districts']['$district']["delta"]["confirmed"]
+      ['districts']['$district']["total"]["vaccinated"]
           .toString();
 
   }
@@ -388,71 +429,99 @@ class StateCard extends StatelessWidget {
 
 }
 
-
-class RowItem extends StatelessWidget {
-  final Color txColor;
-  final String item;
-  final String txHeading;
+class StateChart extends StatelessWidget {
   final String state;
-  final Map mapResponseInRow;
-  final String date;
-  final DateTime currentDate;
+  final Map mapResponseInCard;
+  final String dateInString;
+  final DateTime date;
 
-  const RowItem({Key key, this.txColor, this.item, this.txHeading, this.state, this.mapResponseInRow, this.date, this.currentDate}) : super(key: key);
+  const StateChart(
+      {Key key,
+        this.state,
+        this.mapResponseInCard,
+        this.date,
+        this.dateInString})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-
-      children: [
-        Text(
-            itemNumber("delta"),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        Text(txHeading,style: TextStyle(
-          color: txColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        )),
-        Text(
-            itemNumber("total"),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 14,
-
-            )),
-
-
-      ],
-    );
+    return LineChart(LineChartData(
+        gridData: FlGridData(show: false),
+        titlesData: FlTitlesData(show: false),
+        borderData: FlBorderData(show: false),
+        lineBarsData: [
+          LineChartBarData(
+              barWidth: 6,
+              colors: [primaryRed],
+              spots: getGraphData(),
+              isCurved: false,
+              dotData: FlDotData(show: false),
+              belowBarData: BarAreaData(show: false))
+        ]));
   }
 
-  String itemNumber(String deltaortotal) {
-    if(mapResponseInRow==null)
-      return 0.toString();
-    else if(mapResponseInRow['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-    ["$deltaortotal"]==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-    ["$deltaortotal"]["$item"]==null){
-      return 0.toString();
-    }
+  String previousDates(int x) {
+    DateTime pvDate = date.subtract(Duration(days: x));
 
-    else
-      return mapResponseInRow['$date']['$state']
-      ["$deltaortotal"]["$item"]
-          .toString();
+    var outFormatter = new DateFormat('yyyy-MM-dd');
+    return outFormatter.format(pvDate);
+  }
 
+  double getData(int y) {
+    if (mapResponseInCard == null)
+      return 0;
+    else if (mapResponseInCard['${previousDates(y)}'] == null) {
+      return 0;
+    } else if (mapResponseInCard['${previousDates(y)}']['$state'] == null) {
+      return 0;
+    } else if (mapResponseInCard['${previousDates(y)}']['$state']["total"] ==
+        null) {
+      return 0;
+    } else if (mapResponseInCard['${previousDates(y)}']['$state']["total"]
+    ["vaccinated"] ==
+        null) {
+      return 0;
+    } else
+      return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
+      ["total"]["vaccinated"]
+          .toString());
+  }
+
+  List<FlSpot> getGraphData() {
+    return [
+      FlSpot(0, getData(29)),
+      FlSpot(1, getData(28)),
+      FlSpot(2, getData(27)),
+      FlSpot(3, getData(26)),
+      FlSpot(4, getData(25)),
+      FlSpot(5, getData(24)),
+      FlSpot(6, getData(23)),
+      FlSpot(7, getData(22)),
+      FlSpot(8, getData(21)),
+      FlSpot(9, getData(20)),
+      FlSpot(10, getData(19)),
+      FlSpot(11, getData(18)),
+      FlSpot(12, getData(17)),
+      FlSpot(13, getData(16)),
+      FlSpot(14, getData(15)),
+      FlSpot(15, getData(14)),
+      FlSpot(16, getData(13)),
+      FlSpot(17, getData(12)),
+      FlSpot(18, getData(11)),
+      FlSpot(19, getData(10)),
+      FlSpot(20, getData(9)),
+      FlSpot(21, getData(8)),
+      FlSpot(22, getData(7)),
+      FlSpot(23, getData(6)),
+      FlSpot(24, getData(5)),
+      FlSpot(25, getData(4)),
+      FlSpot(26, getData(3)),
+      FlSpot(27, getData(2)),
+      FlSpot(28, getData(1)),
+      FlSpot(29, getData(0)),
+    ];
   }
 }
+
+
+

@@ -110,30 +110,81 @@ class _IndiaScreenState extends State<IndiaScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                     children: [
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: cardYellow,
+                      Column(
+                        children: [
+                          Text(
+                              getData("dailyconfirmed"),
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              )),
+                          Text("CONFIRMED",style: TextStyle(
+                            color: cardYellow,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          )),
+                          Text(getData("totalconfirmed")
+                              ,
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 14,
 
-                        txHeading: "CONFIRMED",
-                        item: "confirmed",
-                        currentDate: _selectedDay,),
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: cardGreen,
+                              )),
 
-                        txHeading: "RECOVERED",
-                        item: "recovered",
-                        currentDate: _selectedDay,),
-                      RowItem(
-                        mapResponseInRow: mapResponse,
-                        date: formatDate(),
-                        txColor: primaryRed,
 
-                        txHeading: "DECEASED",
-                        item: "deceased",
-                        currentDate: _selectedDay,),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                              getData("dailyrecovered"),
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              )),
+                          Text("RECOVERED",style: TextStyle(
+                            color: cardGreen,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          )),
+                          Text(
+                              getData("totalrecovered"),
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 14,
+
+                              )),
+
+
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                              getData("dailydeceased"),
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              )),
+                          Text("DECEASED",style: TextStyle(
+                            color: primaryRed,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          )),
+                          Text(
+                              getData("totaldeceased"),
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 14,
+
+                              )),
+
+
+                        ],
+                      ),
 
                     ],
                   ),
@@ -166,7 +217,7 @@ class _IndiaScreenState extends State<IndiaScreen> {
     Navigator.push(
     context,
     MaterialPageRoute(
-    builder: (context) => StateScreen(state: stateList[index])));},
+    builder: (context) => StateScreen(stateCode: stateList[index].stateCode,stateName: stateList[index].stateName,)));},
     
                           item: stateList[index],),
                       );
@@ -277,74 +328,4 @@ class StateCard extends StatelessWidget {
 
   }
 }
-
-class RowItem extends StatelessWidget {
-  final Color txColor;
-  final String item;
-  final String txHeading;
-  final Map mapResponseInRow;
-  final String date;
-  final DateTime currentDate;
-
-  const RowItem({Key key, this.txColor, this.item, this.txHeading,  this.mapResponseInRow, this.date, this.currentDate}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-
-      children: [
-        Text(
-            itemNumber("delta"),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        Text(txHeading,style: TextStyle(
-          color: txColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        )),
-        Text(
-            itemNumber("total"),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 14,
-
-            )),
-
-
-      ],
-    );
-  }
-
-  String itemNumber(String deltaortotal) {
-    if(mapResponseInRow==null)
-      return 0.toString();
-    else if(mapResponseInRow['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-    ["$deltaortotal"]==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-    ["$deltaortotal"]["$item"]==null){
-      return 0.toString();
-    }
-
-    else
-      return mapResponseInRow['$date']['TT']
-      ["$deltaortotal"]["$item"]
-          .toString();
-
-  }
-}
-
-
-
 
