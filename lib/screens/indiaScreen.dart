@@ -8,6 +8,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../constants.dart';
 import 'homeScreen.dart';
+
 class IndiaScreen extends StatefulWidget {
   const IndiaScreen({Key key}) : super(key: key);
 
@@ -16,35 +17,18 @@ class IndiaScreen extends StatefulWidget {
 }
 
 class _IndiaScreenState extends State<IndiaScreen> {
-
-
   String formatDate() {
     var outFormatter = new DateFormat('yyyy-MM-dd');
     return outFormatter.format(_selectedDay);
   }
-  int getIndex(){
-    DateTime _today=DateTime.now();
-    var outFormatter = new DateFormat('yyyy-MM-dd');
-    for(int i=0;i<listResponse.length;i++){
-      if(listResponse[i]["dateymd"].toString()==outFormatter.format(_selectedDay))
-        return i;
-      else if(outFormatter.format(_today)==outFormatter.format(_selectedDay)){
-        return (listResponse.length-1);
-      }
-    }
-  }
-  String getData(String item){
-
-    return listResponse[getIndex()]["$item"];
 
 
 
 
-  }
+
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
-
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +43,7 @@ class _IndiaScreenState extends State<IndiaScreen> {
           children: [
             Container(
               padding:
-              EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+                  EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: bgGrey,
@@ -97,7 +81,8 @@ class _IndiaScreenState extends State<IndiaScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(
+                  top: 16, left: 16, right: 16, bottom: 8),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -105,86 +90,35 @@ class _IndiaScreenState extends State<IndiaScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 26,bottom: 26,left: 10,right: 10),
+                  padding: const EdgeInsets.only(
+                      top: 26, bottom: 26, left: 10, right: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                     children: [
-                      Column(
-                        children: [
-                          Text(
-                              getData("dailyconfirmed"),
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          Text("CONFIRMED",style: TextStyle(
-                            color: cardYellow,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          )),
-                          Text(getData("totalconfirmed")
-                              ,
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 14,
-
-                              )),
-
-
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                              getData("dailyrecovered"),
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          Text("RECOVERED",style: TextStyle(
-                            color: cardGreen,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          )),
-                          Text(
-                              getData("totalrecovered"),
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 14,
-
-                              )),
-
-
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                              getData("dailydeceased"),
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          Text("DECEASED",style: TextStyle(
-                            color: primaryRed,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          )),
-                          Text(
-                              getData("totaldeceased"),
-                              style: TextStyle(
-                                color: primaryText,
-                                fontSize: 14,
-
-                              )),
-
-
-                        ],
-                      ),
+                      RowItem(
+                        mapResponseInRow: mapResponse,
+                        date: formatDate(),
+                        txColor: cardYellow,
+                        state: "TT",
+                        txHeading: "CONFIRMED",
+                        item: "confirmed",
+                        currentDate: _selectedDay,),
+                      RowItem(
+                        mapResponseInRow: mapResponse,
+                        date: formatDate(),
+                        txColor: cardGreen,
+                        state: "TT",
+                        txHeading: "RECOVERED",
+                        item: "recovered",
+                        currentDate: _selectedDay,),
+                      RowItem(
+                        mapResponseInRow: mapResponse,
+                        date: formatDate(),
+                        txColor: primaryRed,
+                        state: "TT",
+                        txHeading: "DECEASED",
+                        item: "deceased",
+                        currentDate: _selectedDay,),
 
                     ],
                   ),
@@ -192,64 +126,82 @@ class _IndiaScreenState extends State<IndiaScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 16),
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 8, bottom: 16),
               child: Container(
-                width: double.infinity,
-                height: 2000,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: bgGrey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15,left: 20,right: 15,bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("State",style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("Confirmed",style: TextStyle(fontWeight: FontWeight.bold),),
 
 
-                decoration: BoxDecoration(
-                  color: bgGrey,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: new ListView.builder
-                  (
-                   physics: const NeverScrollableScrollPhysics(),
-                    itemCount: stateList.length,
 
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: new StateCard(date: formatDate(),
-                          mapResponse: mapResponse,
-                          state: stateList[index],
-                          onTap: (){
-    Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => StateScreen(stateCode: stateList[index].stateCode,stateName: stateList[index].stateName,)));},
-    
-                          item: stateList[index],),
-                      );
-                    }
-                )
-
-              ),
+                          ],
+                        ),
+                      ),
+                      new ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: stateList.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: new StateCard(
+                                date: formatDate(),
+                                mapResponse: mapResponse,
+                                state: stateList[index],
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => StateScreen(
+                                                stateCode:
+                                                    stateList[index].stateCode,
+                                                stateName:
+                                                    stateList[index].stateName,
+                                              )));
+                                },
+                                item: stateList[index],
+                              ),
+                            );
+                          }),
+                    ],
+                  )),
             ),
-
-
-
-
           ],
         ),
       ),
     );
   }
-
 }
 
-
-
 class StateCard extends StatelessWidget {
-
-
   final StateList state;
   final VoidCallback onTap;
   final StateList item;
   final bool selected;
   final String date;
   final Map mapResponse;
-  const StateCard({Key key, this.state, this.onTap, this.item, this.selected, this.date, this.mapResponse}) : super(key: key);
+
+  const StateCard(
+      {Key key,
+      this.state,
+      this.onTap,
+      this.item,
+      this.selected,
+      this.date,
+      this.mapResponse})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -265,17 +217,12 @@ class StateCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: bgWhite,
             borderRadius: BorderRadius.circular(8),
-
           ),
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(
-
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-
               children: <Widget>[
-
                 Text(
                   state.stateName,
                   style: null,
@@ -283,18 +230,20 @@ class StateCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Text(
-                      itemNumber().toString(),
+
+                      Text(NumberFormat.decimalPattern()
+                          .format(int.parse(itemNumber())),
+
                       style: null,
                       textAlign: TextAlign.left,
                     ),
-                    Icon(Icons.arrow_forward_ios,color: primaryRed,size: 16,)
-
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: primaryRed,
+                      size: 16,
+                    )
                   ],
                 )
-
-
-
               ],
               crossAxisAlignment: CrossAxisAlignment.start,
             ),
@@ -303,27 +252,91 @@ class StateCard extends StatelessWidget {
   }
 
   String itemNumber() {
-    if(mapResponse==null)
+    if (mapResponse == null)
       return 0.toString();
-    else if(mapResponse['$date']==null){
+    else if (mapResponse['$date'] == null) {
+      return 0.toString();
+    } else if (mapResponse['$date']['${state.stateCode}'] == null) {
+      return 0.toString();
+    } else if (mapResponse['$date']['${state.stateCode}']["delta"] == null) {
+      return 0.toString();
+    } else if (mapResponse['$date']['${state.stateCode}']["delta"]
+            ["confirmed"] ==
+        null) {
+      return 0.toString();
+    } else
+      return mapResponse['$date']['${state.stateCode}']["delta"]["confirmed"]
+          .toString();
+  }
+}
+
+class RowItem extends StatelessWidget {
+  final Color txColor;
+  final String item;
+  final String txHeading;
+  final String state;
+  final Map mapResponseInRow;
+  final String date;
+  final DateTime currentDate;
+
+  const RowItem({Key key, this.txColor, this.item, this.txHeading, this.state, this.mapResponseInRow, this.date, this.currentDate}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+
+      children: [
+        Text(
+
+
+            NumberFormat.decimalPattern().format(int.parse(itemNumber("delta"))),
+            style: TextStyle(
+              color: primaryText,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            )),
+        Text(txHeading,style: TextStyle(
+          color: txColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        )),
+        Text(
+            NumberFormat.decimalPattern().format(int.parse(itemNumber("total"))),
+
+
+            style: TextStyle(
+              color: primaryText,
+              fontSize: 14,
+
+            )),
+
+
+      ],
+    );
+  }
+
+  String itemNumber(String deltaortotal) {
+    if(mapResponseInRow==null)
+      return 0.toString();
+    else if(mapResponseInRow['$date']==null){
       return 0.toString();
     }
-    else if(mapResponse['$date']['${state.stateCode}']
+    else if(mapResponseInRow['$date']['$state']
         ==null){
       return 0.toString();
     }
-    else if(mapResponse['$date']['${state.stateCode}']
-    ["delta"]==null){
+    else if(mapResponseInRow['$date']['$state']
+    ["$deltaortotal"]==null){
       return 0.toString();
     }
-    else if(mapResponse['$date']['${state.stateCode}']
-    ["delta"]["confirmed"]==null){
+    else if(mapResponseInRow['$date']['$state']
+    ["$deltaortotal"]["$item"]==null){
       return 0.toString();
     }
 
     else
-      return mapResponse['$date']['${state.stateCode}']
-      ["delta"]["confirmed"]
+      return mapResponseInRow['$date']['$state']
+      ["$deltaortotal"]["$item"]
           .toString();
 
   }

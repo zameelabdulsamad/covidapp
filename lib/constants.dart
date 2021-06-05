@@ -11,6 +11,10 @@ const coronaGreen = Color(0xFFCAF5B6);
 const coronaBlue = Color(0xFF9AB8F2);
 const primaryText = Color(0xFF3F3E3E);
 const bgWhite = Color(0xFFFCFCFC);
+const shimmerbasecolor = Color(0xFFD7D7D7);
+const shimmerhighlightcolor = Color(0xFFEAEAEA);
+
+
 
 
 

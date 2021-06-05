@@ -4,6 +4,7 @@ import 'package:covidapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SlotDisplayScreen extends StatefulWidget {
   final String districtCode;
@@ -22,8 +23,8 @@ class SlotDisplayScreen extends StatefulWidget {
 }
 
 Map slotResponse;
-List slotListResponse;
-String dcode = "302";
+List slotListResponse=[];
+bool download=false;
 
 class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
 
@@ -36,7 +37,7 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
   Future fetchData() async {
     http.Response response1;
     var url = Uri.parse(
-        "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id=${dcode}&date=${formatToday(widget.date)}");
+        "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id=${widget.districtCode}&date=${formatToday(widget.date)}");
     response1 = await http.get(url, headers: {
       "accept": "application/json",
       "Accept-Language": "hi_IN",
@@ -48,6 +49,7 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
       setState(() {
         slotResponse = json.decode(response1.body);
         slotListResponse = slotResponse["sessions"];
+        download=true;
       });
     }
   }
@@ -67,6 +69,7 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
       setState(() {
         slotResponse = json.decode(response1.body);
         slotListResponse = slotResponse["sessions"];
+        download=true;
       });
     }
   }
@@ -140,6 +143,10 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+    double maxWidth = MediaQuery.of(context).size.width;
+
+
 
     return Scaffold(
         appBar: AppBar(
@@ -147,13 +154,27 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
           elevation: 0,
           title: Text("Slots for ${widget.dose}"),
         ),
-        body: SingleChildScrollView(
+        body: slotList().length==0&&download? Image(fit:BoxFit.fill,height:maxHeight,width:maxWidth,image: AssetImage('assets/icons/results.png')): SingleChildScrollView(
             child: Column(children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
               width: double.infinity,
-              child: new ListView.builder(
+              child: !download?Column(
+                children: [
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+                  ShimmerWidget(maxHeight: maxHeight),
+
+                ],
+              ):new ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: slotList().length,
                   shrinkWrap: true,
@@ -251,6 +272,33 @@ class _SlotDisplayScreenState extends State<SlotDisplayScreen> {
       );
 
     });
+  }
+}
+
+class ShimmerWidget extends StatelessWidget {
+  const ShimmerWidget({
+    Key key,
+    @required this.maxHeight,
+  }) : super(key: key);
+
+  final double maxHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Shimmer.fromColors(
+        baseColor: shimmerbasecolor,
+        highlightColor: shimmerhighlightcolor,
+        child: Container(
+          height: maxHeight*0.2,
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
   }
 }
 

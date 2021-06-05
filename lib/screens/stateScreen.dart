@@ -6,6 +6,7 @@ import 'package:covidapp/statesList.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import 'package:table_calendar/table_calendar.dart';
 
@@ -22,7 +23,7 @@ class StateScreen extends StatefulWidget {
 }
 
 class _StateScreenState extends State<StateScreen> {
-  List<String> getDistrictList(){
+  List<DistrictCodeList> getDistrictList(){
     if(widget.stateCode=="AN"){
       return ANList;
 
@@ -149,6 +150,10 @@ class _StateScreenState extends State<StateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int tested=int.parse(tpValues("tested"));
+    int confirmed=int.parse(tpValues("confirmed"));
+    double tppercent=tested==0||confirmed==0?0:(confirmed/tested);
+
     return Scaffold(
         appBar: AppBar(
         backgroundColor: bgGrey,
@@ -240,39 +245,136 @@ class _StateScreenState extends State<StateScreen> {
                   ),
                 ),
               ),
+
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 8),
+              child: Container(
+                  decoration: BoxDecoration(
+                    color: bgGrey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 16.0, left: 10, bottom: 8, right: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Test Positivity",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryText),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding:
+                              const EdgeInsets.only(top: 8, bottom: 16, left: 16),
+                              child: new CircularPercentIndicator(
+                                radius: 110.0,
+                                lineWidth: 30.0,
+                                percent: tppercent,
+                                center: new Text(
+                                  "${(tppercent*100).toStringAsFixed(1)}%",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryText,
+                                      fontSize: 12),
+                                ),
+                                progressColor: primaryRed,
+                                backgroundColor: iconGrey,
+                                circularStrokeCap: CircularStrokeCap.butt,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "Total Tested",
+                                    style: TextStyle(fontSize: 14, color: primaryText),
+                                  ),
+                                  Text(
+                                    NumberFormat.decimalPattern().format(int.parse(tpValues("tested")))
+                                    ,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: primaryText,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 16),
               child: Container(
                   width: double.infinity,
-                  height: 2000,
 
 
                   decoration: BoxDecoration(
                     color: bgGrey,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: new ListView.builder
-                    (
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: getDistrictList().length,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15,left: 20,right: 15,bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("District",style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("Confirmed",style: TextStyle(fontWeight: FontWeight.bold),),
 
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: new StateCard(date: formatDate(),
-                            mapResponse: mapResponse,
-                            state: widget.stateCode,
-                            district: getDistrictList()[index],
-                            onTap: (){
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DistrictScreen(state: widget.stateCode,district: getDistrictList()[index],)));},
 
-                            item: getDistrictList()[index],),
-                        );
-                      }
+
+                          ],
+                        ),
+                      ),
+                      new ListView.builder
+                        (
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: getDistrictList().length,
+                          shrinkWrap: true,
+
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: new StateCard(date: formatDate(),
+                                mapResponse: mapResponse,
+                                state: widget.stateCode,
+                                district: getDistrictList()[index].districtName,
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => DistrictScreen(state: widget.stateCode,district: getDistrictList()[index].districtName,)));},
+
+                                item: getDistrictList()[index].districtName,),
+                            );
+                          }
+                      ),
+                    ],
                   )
 
               ),
@@ -283,6 +385,32 @@ class _StateScreenState extends State<StateScreen> {
         ),
       ),
     );
+  }
+
+  String tpValues(String item) {
+    if(mapResponse==null)
+      return 0.toString();
+    else if(mapResponse['${formatDate()}']==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+        ==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+    ["delta"]==null){
+      return 0.toString();
+    }
+    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
+    ["delta"]["$item"]==null){
+      return 0.toString();
+    }
+
+    else
+      return mapResponse['${formatDate()}']['${widget.stateCode}']
+      ["delta"]["$item"]
+          .toString();
+
   }
 
 }
@@ -333,7 +461,8 @@ class StateCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      itemNumber().toString(),
+                      NumberFormat.decimalPattern().format(int.parse(itemNumber())),
+
                       style: null,
                       textAlign: TextAlign.left,
                     ),
@@ -406,7 +535,9 @@ class RowItem extends StatelessWidget {
 
       children: [
         Text(
-            itemNumber("delta"),
+
+
+    NumberFormat.decimalPattern().format(int.parse(itemNumber("delta"))),
             style: TextStyle(
               color: primaryText,
               fontSize: 20,
@@ -418,7 +549,9 @@ class RowItem extends StatelessWidget {
           fontWeight: FontWeight.w600,
         )),
         Text(
-            itemNumber("total"),
+            NumberFormat.decimalPattern().format(int.parse(itemNumber("total"))),
+
+
             style: TextStyle(
               color: primaryText,
               fontSize: 14,

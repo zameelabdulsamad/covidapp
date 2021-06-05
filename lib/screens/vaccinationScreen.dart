@@ -25,223 +25,252 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
     double maxHeight = MediaQuery.of(context).size.height;
     double maxWidth = MediaQuery.of(context).size.width;
 
+
     DateTime _today = DateTime.now();
     String formatDate(DateTime x) {
       var outFormatter = new DateFormat('yyyy-MM-dd');
       return outFormatter.format(x);
     }
 
-    String getDistrictVaccinated() {
-      if (mapResponse['${formatDate(_today)}'] == null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL'] == null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"] ==
+    String getDistrictVaccinated(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] == null) {
+        return 0.toString();
+
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode'] == null) {
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram'] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram']["total"] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict']["total"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram']["total"]["vaccinated"] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict']["total"]["vaccinated2"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       } else {
-        return mapResponse['${formatDate(_today)}']['KL']["districts"]
-                ['Malappuram']["total"]["vaccinated"]
+        return mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+                ['$userDistrict']["total"]["vaccinated2"]
             .toString();
       }
     }
 
-    String getDistricPopulation() {
-      if (mapResponse['${formatDate(_today)}'] == null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL'] == null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"] ==
+
+    String getDistricPopulation(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] == null) {
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode'] == null) {
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram'] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram']["meta"] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict']["meta"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
-      } else if (mapResponse['${formatDate(_today)}']['KL']["districts"]
-              ['Malappuram']["meta"]["population"] ==
+        return 0.toString();
+      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+              ['$userDistrict']["meta"]["population"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["districts"]['Malappuram']["meta"]["population"]
-            .toString();
+        return 0.toString();
       } else {
-        return mapResponse['${formatDate(_today)}']['KL']["districts"]
-                ['Malappuram']["meta"]["population"]
+        return mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
+                ['$userDistrict']["meta"]["population"]
             .toString();
       }
     }
 
-    String getStateVaccinated() {
-      if (mapResponse['${formatDate(_today)}'] ==
+    String getStateVaccinated(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["total"]["vaccinated"]
-            .toString();
-      }else if (mapResponse['${formatDate(_today)}']['KL'] ==
+        return 0.toString();
+      }else if (mapResponse['${formatDate(date)}']['$userStateCode'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['KL']["total"] ==
+      else if (mapResponse['${formatDate(date)}']['$userStateCode']["total"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       }
 
 
-      else if (mapResponse['${formatDate(_today)}']['KL']["total"]["vaccinated"] ==
+      else if (mapResponse['${formatDate(date)}']['$userStateCode']["total"]["vaccinated2"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       } else {
-        return mapResponse['${formatDate(_today)}']['KL']["total"]["vaccinated"]
+        return mapResponse['${formatDate(date)}']['$userStateCode']["total"]["vaccinated2"]
             .toString();
       }
     }
 
-    String getStatePopulation() {
-      if (mapResponse['${formatDate(_today)}'] ==
+    String getStatePopulation(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['KL'] ==
+      else if (mapResponse['${formatDate(date)}']['$userStateCode'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['KL']["meta"]==
+      else if (mapResponse['${formatDate(date)}']['$userStateCode']["meta"]==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['KL']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['KL']["meta"]["population"] ==
+      else if (mapResponse['${formatDate(date)}']['$userStateCode']["meta"]["population"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['KL']["meta"]["population"]
-            .toString();
-      } else {
-        return mapResponse['${formatDate(_today)}']['KL']["meta"]["population"]
+        return 0.toString();
+      }else {
+        return mapResponse['${formatDate(date)}']['$userStateCode']["meta"]["population"]
             .toString();
       }
     }
 
-    String getIndiaVaccinated() {
-      if (mapResponse['${formatDate(_today)}'] ==
+    String getIndiaVaccinated(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['TT'] ==
+      else if (mapResponse['${formatDate(date)}']['TT'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['TT']["total"]==
+      else if (mapResponse['${formatDate(date)}']['TT']["total"]==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["total"]["vaccinated"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['TT']["total"]["vaccinated"] ==
+      else if (mapResponse['${formatDate(date)}']['TT']["total"]["vaccinated2"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['TT']["total"]["vaccinated"]
-            .toString();
-      } else {
-        return mapResponse['${formatDate(_today)}']['TT']["total"]["vaccinated"]
+        return 0.toString();
+      }else {
+        return mapResponse['${formatDate(date)}']['TT']["total"]["vaccinated2"]
             .toString();
       }
     }
 
-    String getIndiaPopulation() {
-      if (mapResponse['${formatDate(_today)}'] ==
+    String getIndiaPopulation(DateTime date) {
+      if (mapResponse['${formatDate(date)}'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['TT'] ==
+      else if (mapResponse['${formatDate(date)}']['TT'] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
-      else if (mapResponse['${formatDate(_today)}']['TT']["meta"] ==
+      else if (mapResponse['${formatDate(date)}']['TT']["meta"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-        ['TT']["meta"]["population"]
-            .toString();
+        return 0.toString();
       }
 
-      else if (mapResponse['${formatDate(_today)}']['TT']["meta"]["population"] ==
+      else if (mapResponse['${formatDate(date)}']['TT']["meta"]["population"] ==
           null) {
-        return mapResponse['${formatDate(_today.subtract(Duration(days: 1)))}']
-                ['TT']["meta"]["population"]
-            .toString();
+        return 0.toString();
       } else {
-        return mapResponse['${formatDate(_today)}']['TT']["meta"]["population"]
+        return mapResponse['${formatDate(date)}']['TT']["meta"]["population"]
             .toString();
       }
     }
 
-    int vaccinatedDistrict = int.parse(getDistrictVaccinated());
-    int populationDistrict = int.parse(getDistricPopulation());
-    double districtpercentage = (vaccinatedDistrict / populationDistrict);
+    String peoplePercent(String gds){
+      if(gds=="getDistrictVaccinated"){
+        if(getDistrictVaccinated(_today)=="0"){
+          if(getDistrictVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getDistrictVaccinated(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getDistrictVaccinated(_today);
+        }
+      }
+      if(gds=="getDistricPopulation"){
+        if(getDistricPopulation(_today)=="0"){
+          if(getDistricPopulation(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getDistricPopulation(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getDistricPopulation(_today);
+        }
+      }
+      if(gds=="getStateVaccinated"){
+        if(getStateVaccinated(_today)=="0"){
+          if(getStateVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getStateVaccinated(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getStateVaccinated(_today);
+        }
+      }
+      if(gds=="getStatePopulation"){
+        if(getStatePopulation(_today)=="0"){
+          if(getStatePopulation(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getStatePopulation(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getStatePopulation(_today);
+        }
+      }
+      if(gds=="getIndiaVaccinated"){
+        if(getIndiaVaccinated(_today)=="0"){
+          if(getIndiaVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getIndiaVaccinated(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getIndiaVaccinated(_today);
+        }
+      }
+      if(gds=="getIndiaPopulation"){
+        if(getIndiaPopulation(_today)=="0"){
+          if(getIndiaPopulation(_today.subtract(Duration(days: 1)))=="0"){
+            return 0.toString();
+          }
+          else{
+            return getIndiaPopulation(_today.subtract(Duration(days: 1)));
+          }
+        }
+        else{
+          return getIndiaPopulation(_today);
+        }
+      }
 
-    int vaccinatedState = int.parse(getStateVaccinated());
-    int populationState = int.parse(getStatePopulation());
-    double statepercentage = (vaccinatedState / populationState);
+    }
 
-    int vaccinatedIndia = int.parse(getIndiaVaccinated());
-    int populationIndia = int.parse(getIndiaPopulation());
-    double indiapercentage = (vaccinatedIndia / populationIndia);
+    int vaccinatedDistrict = int.parse(peoplePercent("getDistrictVaccinated"));
+    int populationDistrict = int.parse(peoplePercent("getDistricPopulation"));
+    double districtpercentage = vaccinatedDistrict==0||populationDistrict==0?0:(vaccinatedDistrict / populationDistrict);
+
+    int vaccinatedState = int.parse(peoplePercent("getStateVaccinated"));
+    int populationState = int.parse(peoplePercent("getStatePopulation"));
+    double statepercentage =  vaccinatedState==0||populationState==0?0:(vaccinatedState / populationState);
+
+    int vaccinatedIndia = int.parse(peoplePercent("getIndiaVaccinated"));
+    int populationIndia = int.parse(peoplePercent("getIndiaPopulation"));
+    double indiapercentage =  vaccinatedIndia==0||populationIndia==0?0:(vaccinatedIndia / populationIndia);
 
     return Scaffold(
         appBar: AppBar(
@@ -255,11 +284,11 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 child: Column(children: [
                   PercentageCard(
                     percentage: districtpercentage,
-                    name: "Malappuram",
-                    totalVaccinated: getDistrictVaccinated(),
+                    name: "$userDistrict",
+                    totalVaccinated: peoplePercent("getDistrictVaccinated"),
                     page: VaccinationDistrictScreen(
-                      state: "KL",
-                      district: "Malappuram",
+                      state: "$userStateCode",
+                      district: "$userDistrict",
                     ),
                   ),
                   SizedBox(
@@ -267,11 +296,11 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   ),
                   PercentageCard(
                     percentage: statepercentage,
-                    totalVaccinated: getStateVaccinated(),
-                    name: "Kerala",
+                    totalVaccinated: peoplePercent("getStateVaccinated"),
+                    name: "$userState",
                     page: VaccinationStateScreen(
-                      stateCode: "KL",
-                      stateName: "Kerala",
+                      stateCode: "$userStateCode",
+                      stateName: "$userState",
                     ),
                   ),
                   SizedBox(
@@ -279,7 +308,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   ),
                   PercentageCard(
                     percentage: indiapercentage,
-                    totalVaccinated: getIndiaVaccinated(),
+                    totalVaccinated: peoplePercent("getIndiaVaccinated"),
                     name: "India",
                     page: VaccinationIndiaScreen(),
                   ),
@@ -504,11 +533,12 @@ class PercentageCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "Total Vaccinated",
+                            "Vaccinated both",
                             style: TextStyle(fontSize: 16, color: primaryText),
                           ),
                           Text(
-                            totalVaccinated,
+                            NumberFormat.decimalPattern().format(int.parse(totalVaccinated))
+                            ,
                             style: TextStyle(
                                 fontSize: 20,
                                 color: primaryText,

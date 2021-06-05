@@ -152,11 +152,13 @@ class DataCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+
     return Container(
       child: Padding(
         padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
         child: Container(
-          height: 150,
+          height: maxHeight*0.2,
           width: double.infinity,
           decoration: BoxDecoration(
             color: cardColor,
@@ -183,7 +185,9 @@ class DataCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                  itemNumber("delta"),
+                      NumberFormat.decimalPattern().format(int.parse(itemNumber("delta")))
+
+                      ,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 35,
@@ -192,21 +196,25 @@ class DataCard extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: AspectRatio(
-                  aspectRatio: 7,
-                  child: LineChart(LineChartData(
-                      gridData: FlGridData(show: false),
-                      titlesData: FlTitlesData(show: false),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                            barWidth: 6,
-                            colors: [graphColor],
-                            spots: getGraphData(),
-                            isCurved: false,
-                            dotData: FlDotData(show: false),
-                            belowBarData: BarAreaData(show: false))
-                      ])),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: maxHeight*0.1,
+                    child: LineChart(LineChartData(
+                        gridData: FlGridData(show: false),
+                        titlesData: FlTitlesData(show: false),
+                        borderData: FlBorderData(show: false),
+                        lineBarsData: [
+                          LineChartBarData(
+                              barWidth: 6,
+                              colors: [graphColor],
+                              spots: getGraphData(),
+                              isCurved: false,
+                              dotData: FlDotData(show: false),
+                              belowBarData: BarAreaData(show: false))
+                        ])),
+                  ),
                 ),
               ),
               Row(
@@ -225,7 +233,9 @@ class DataCard extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 8),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child:Text( itemNumber("total"),
+                      child:Text( NumberFormat.decimalPattern().format(int.parse(itemNumber("total")))
+
+                          ,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 26,

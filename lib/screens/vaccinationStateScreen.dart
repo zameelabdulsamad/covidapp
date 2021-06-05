@@ -19,7 +19,7 @@ class VaccinationStateScreen extends StatefulWidget {
 }
 
 class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
-  List<String> getDistrictList(){
+  List<DistrictCodeList> getDistrictList(){
     if(widget.stateCode=="AN"){
       return ANList;
 
@@ -146,6 +146,8 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgGrey,
@@ -198,6 +200,7 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 16,right: 16),
               child: Container(
+                height: maxHeight*0.35,
                   decoration: BoxDecoration(
                     color: bgGrey,
                     borderRadius: BorderRadius.circular(8),
@@ -215,13 +218,13 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Total Vaccinated",
+                                  "Vaccinated both",
                                   style: TextStyle(
                                       fontSize: 18,
                                       color: primaryText),
                                 ),
                                 Text(
-                                  getTotalVAC(),
+                                  NumberFormat.decimalPattern().format(int.parse(getTotalVAC())),
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: primaryText,
@@ -233,9 +236,9 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Expanded(
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: AspectRatio(
                               aspectRatio: 2,
                               child: StateChart(
@@ -254,36 +257,53 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
               padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 16),
               child: Container(
                   width: double.infinity,
-                  height: 2000,
 
 
                   decoration: BoxDecoration(
                     color: bgGrey,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: new ListView.builder
-                    (
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: getDistrictList().length,
-
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: new StateCard(date: formatDate(),
-                            mapResponse: mapResponse,
-                            state: widget.stateCode,
-                            district: getDistrictList()[index],
-                            onTap: (){
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => VaccinationDistrictScreen(state: widget.stateCode,district: getDistrictList()[index],)));},
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15,left: 20,right: 15,bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("District",style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("Vaccinated",style: TextStyle(fontWeight: FontWeight.bold),),
 
 
 
-                            item: getDistrictList()[index],),
-                        );
-                      }
+                          ],
+                        ),
+                      ),
+                      new ListView.builder
+                        (
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: getDistrictList().length,
+                          shrinkWrap: true,
+
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: new StateCard(date: formatDate(),
+                                mapResponse: mapResponse,
+                                state: widget.stateCode,
+                                district: getDistrictList()[index].districtName,
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => VaccinationDistrictScreen(state: widget.stateCode,district: getDistrictList()[index].districtName,)));},
+
+
+
+                                item: getDistrictList()[index].districtName,),
+                            );
+                          }
+                      ),
+                    ],
                   )
 
               ),
@@ -314,13 +334,13 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
       return 0.toString();
     }
     else if(mapResponse['${formatDate()}']['${widget.stateCode}']
-    ["total"]["vaccinated"]==null){
+    ["total"]["vaccinated2"]==null){
       return 0.toString();
     }
 
     else
       return mapResponse['${formatDate()}']['${widget.stateCode}']
-      ["total"]["vaccinated"]
+      ["total"]["vaccinated2"]
           .toString();
 
   }
@@ -357,7 +377,7 @@ class StateCard extends StatelessWidget {
 
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.only(left: 10,right: 10,top: 15,bottom: 15),
             child: Row(
 
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -373,7 +393,8 @@ class StateCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      itemNumber().toString(),
+                      NumberFormat.decimalPattern().format(int.parse(itemNumber())),
+
                       style: null,
                       textAlign: TextAlign.left,
                     ),
@@ -415,13 +436,13 @@ class StateCard extends StatelessWidget {
       return 0.toString();
     }
     else if(mapResponse['$date']['$state']
-    ['districts']['$district']["total"]["vaccinated"]==null){
+    ['districts']['$district']["total"]["vaccinated2"]==null){
       return 0.toString();
     }
 
     else
       return mapResponse['$date']['$state']
-      ['districts']['$district']["total"]["vaccinated"]
+      ['districts']['$district']["total"]["vaccinated2"]
           .toString();
 
   }
@@ -478,12 +499,12 @@ class StateChart extends StatelessWidget {
         null) {
       return 0;
     } else if (mapResponseInCard['${previousDates(y)}']['$state']["total"]
-    ["vaccinated"] ==
+    ["vaccinated2"] ==
         null) {
       return 0;
     } else
       return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
-      ["total"]["vaccinated"]
+      ["total"]["vaccinated2"]
           .toString());
   }
 

@@ -25,6 +25,8 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgGrey,
@@ -77,6 +79,7 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 16,right: 16),
               child: Container(
+                height: maxHeight*0.35,
                   decoration: BoxDecoration(
                     color: bgGrey,
                     borderRadius: BorderRadius.circular(8),
@@ -94,13 +97,13 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Total Vaccinated",
+                                  "Vaccinated both",
                                   style: TextStyle(
                                       fontSize: 18,
                                       color: primaryText),
                                 ),
                                 Text(
-                                  getTotalVAC(),
+                                    NumberFormat.decimalPattern().format(int.parse(getTotalVAC())),
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: primaryText,
@@ -112,9 +115,9 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Expanded(
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: AspectRatio(
                               aspectRatio: 2,
                               child: StateChart(
@@ -163,13 +166,13 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
       return 0.toString();
     }
     else if(mapResponse['${formatDate()}']['${widget.state}']["districts"]['${widget.district}']
-    ["total"]["vaccinated"]==null){
+    ["total"]["vaccinated2"]==null){
       return 0.toString();
     }
 
     else
       return mapResponse['${formatDate()}']['${widget.state}']["districts"]['${widget.district}']
-      ["total"]["vaccinated"]
+      ["total"]["vaccinated2"]
           .toString();
 
   }
@@ -237,12 +240,12 @@ class StateChart extends StatelessWidget {
         null) {
       return 0;
     } else if (mapResponseInCard['${previousDates(y)}']['$state']["districts"]['$district']
-    ["total"]["vaccinated"] ==
+    ["total"]["vaccinated2"] ==
         null) {
       return 0;
     } else
       return double.parse(mapResponseInCard['${previousDates(y)}']['$state']["districts"]['$district']
-      ["total"]["vaccinated"]
+      ["total"]["vaccinated2"]
           .toString());
   }
 
