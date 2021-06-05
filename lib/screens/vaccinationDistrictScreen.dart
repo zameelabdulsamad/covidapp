@@ -34,6 +34,8 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
         title: Text(widget.district),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+
         child: Column(
           children: [
             Container(

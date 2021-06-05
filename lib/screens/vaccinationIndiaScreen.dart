@@ -35,6 +35,8 @@ class _VaccinationIndiaScreenState extends State<VaccinationIndiaScreen> {
         title: Text("India"),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+
         child: Column(
           children: [
             Container(

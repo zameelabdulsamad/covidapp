@@ -279,6 +279,8 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           title: Text("Vaccination"),
         ),
         body: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(children: [

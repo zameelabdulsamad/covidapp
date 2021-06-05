@@ -39,6 +39,8 @@ class _IndiaScreenState extends State<IndiaScreen> {
         title: Text("India"),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+
         child: Column(
           children: [
             Container(

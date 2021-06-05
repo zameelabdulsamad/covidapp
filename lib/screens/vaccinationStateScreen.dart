@@ -155,6 +155,8 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
         title: Text(widget.stateName),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+
         child: Column(
           children: [
             Container(

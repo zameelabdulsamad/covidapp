@@ -24,6 +24,8 @@ class _WorldwideScreenState extends State<WorldwideScreen> {
           title: Text("Worldwide"),
         ),
         body: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+
             child: Column(children: [
           Container(
             padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),

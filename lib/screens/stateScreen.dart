@@ -161,6 +161,8 @@ class _StateScreenState extends State<StateScreen> {
         title: Text(widget.stateName),
     ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+
         child: Column(
           children: [
             Container(
