@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:covidapp/districtList.dart';
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/districtScreen.dart';
 import 'package:covidapp/statesList.dart';
 import 'package:flutter/material.dart';

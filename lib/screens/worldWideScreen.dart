@@ -1,3 +1,4 @@
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/homeScreen.dart';
 import 'package:covidapp/statesList.dart';
 import 'package:flutter/material.dart';

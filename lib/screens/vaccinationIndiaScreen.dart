@@ -1,4 +1,5 @@
 import 'package:covidapp/constants.dart';
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/homeScreen.dart';
 import 'package:covidapp/screens/vaccinationStateScreen.dart';
 import 'package:covidapp/statesList.dart';

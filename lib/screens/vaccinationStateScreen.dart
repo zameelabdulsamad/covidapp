@@ -1,5 +1,6 @@
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/districtList.dart';
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/homeScreen.dart';
 import 'package:covidapp/screens/vaccinationDistrictScreen.dart';
 import 'package:fl_chart/fl_chart.dart';

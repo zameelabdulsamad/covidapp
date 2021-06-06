@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:covidapp/constants.dart';
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/boardingScreen.dart';
 import 'package:covidapp/screens/changeUserLocation.dart';
 import 'package:covidapp/screens/districtScreen.dart';
@@ -28,12 +29,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-List WMapResponse;
-List WListResponse;
-Map mapResponse={
-  "2021-05-31":""
-};
-bool download = false;
+
 String userDistrict;
 String userState;
 String userDistrictCode;
@@ -51,35 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return MobileAds.instance.initialize();
   }
 
-  Future fetchData() async {
-    http.Response response2;
-    var url2 = Uri.parse("https://coronavirus-19-api.herokuapp.com/countries");
-    response2 = await http.get(url2);
-    http.Response response3;
-    var url3 =
-        Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
-    response3 = await http.get(url3);
-    print(response2.statusCode);
 
-    print(response3.statusCode);
-    if (response2.statusCode == 200 && response3.statusCode == 200) {
-      setState(() {
-        WMapResponse = json.decode(response2.body);
-        mapResponse["2021-05-31"] = json.decode(response3.body)["2021-05-31"];
-        mapResponse["2021-06-01"] = json.decode(response3.body)["2021-06-01"];
-        mapResponse["2021-06-02"] = json.decode(response3.body)["2021-06-02"];
-        mapResponse["2021-06-03"] = json.decode(response3.body)["2021-06-03"];
-        mapResponse["2021-06-04"] = json.decode(response3.body)["2021-06-04"];
-        mapResponse["2021-06-05"] = json.decode(response3.body)["2021-06-05"];
-        mapResponse["2021-06-06"] = json.decode(response3.body)["2021-06-06"];
-        download = true;
-      });
-    }
-  }
 
   @override
   void initState() {
-    fetchData();
     userDistrict = UserPreferences().districtName;
     userState = UserPreferences().stateName;
     userDistrictCode = UserPreferences().districtCode;

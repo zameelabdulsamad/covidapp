@@ -1,4 +1,5 @@
 import 'package:covidapp/constants.dart';
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/homeScreen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

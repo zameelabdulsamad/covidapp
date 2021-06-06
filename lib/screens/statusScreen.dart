@@ -1,4 +1,5 @@
 
+import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/indiaScreen.dart';
 import 'package:covidapp/screens/stateScreen.dart';
 import 'package:covidapp/screens/vaccinationScreen.dart';
