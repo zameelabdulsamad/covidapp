@@ -254,11 +254,8 @@ class _ChangeUserLocationState extends State<ChangeUserLocation> {
 
 
 
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                HomeScreen()));
+                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                        HomeScreen()), (Route<dynamic> route) => false);
 
                   }
 

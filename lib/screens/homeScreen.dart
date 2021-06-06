@@ -4,6 +4,7 @@ import 'package:covidapp/screens/boardingScreen.dart';
 import 'package:covidapp/screens/changeUserLocation.dart';
 import 'package:covidapp/screens/districtScreen.dart';
 import 'package:covidapp/screens/indiaScreen.dart';
+import 'package:covidapp/screens/newsScreen.dart';
 import 'package:covidapp/screens/settingsPage.dart';
 import 'package:covidapp/screens/stateScreen.dart';
 import 'package:covidapp/screens/statusScreen.dart';
@@ -226,7 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       homeButton(
                         title: "News",
                         buttonIcon: Icons.article,
-                      ),
+                          homeButtonPage: NewsScreen()),
+
+
                       homeButton(
                         title: "Vaccination",
                         buttonIcon: Icons.medical_services_rounded,
@@ -775,7 +778,7 @@ class HomeInfoCard extends StatelessWidget {
         return itemNumber(_today.subtract(Duration(days: 1)));
       }
     } else {
-      itemNumber(_today);
+      return itemNumber(_today);
     }
   }
 

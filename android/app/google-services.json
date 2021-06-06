@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "1007316061948",
-    "project_id": "covid-point",
-    "storage_bucket": "covid-point.appspot.com"
+    "project_number": "420432125072",
+    "project_id": "covidpoint-app",
+    "storage_bucket": "covidpoint-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1007316061948:android:d72d4e1e4cfedd0b8f1179",
+        "mobilesdk_app_id": "1:420432125072:android:7394740d061d991f9f4c15",
         "android_client_info": {
           "package_name": "com.covidpoint.covidapp.covidapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1007316061948-ggct8e58odecqhdbnv6i2ngpfp60sccs.apps.googleusercontent.com",
+          "client_id": "420432125072-nla63j2mbnk5078pu38jk4qiahdf7jqv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAic7LSFOyFbfv1HnOJW59V53ekOOsOuvM"
+          "current_key": "AIzaSyB-sNqgc7mpQu_hzn9fCu9JqK3_4kZAR_Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1007316061948-ggct8e58odecqhdbnv6i2ngpfp60sccs.apps.googleusercontent.com",
+              "client_id": "420432125072-nla63j2mbnk5078pu38jk4qiahdf7jqv.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
