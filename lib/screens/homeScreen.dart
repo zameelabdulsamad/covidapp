@@ -30,7 +30,9 @@ class HomeScreen extends StatefulWidget {
 
 List WMapResponse;
 List WListResponse;
-Map mapResponse;
+Map mapResponse={
+  "2021-05-31":""
+};
 bool download = false;
 String userDistrict;
 String userState;
@@ -63,7 +65,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response2.statusCode == 200 && response3.statusCode == 200) {
       setState(() {
         WMapResponse = json.decode(response2.body);
-        mapResponse = json.decode(response3.body);
+        mapResponse["2021-05-31"] = json.decode(response3.body)["2021-05-31"];
+        mapResponse["2021-06-01"] = json.decode(response3.body)["2021-06-01"];
+        mapResponse["2021-06-02"] = json.decode(response3.body)["2021-06-02"];
+        mapResponse["2021-06-03"] = json.decode(response3.body)["2021-06-03"];
+        mapResponse["2021-06-04"] = json.decode(response3.body)["2021-06-04"];
+        mapResponse["2021-06-05"] = json.decode(response3.body)["2021-06-05"];
+        mapResponse["2021-06-06"] = json.decode(response3.body)["2021-06-06"];
         download = true;
       });
     }
