@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
     var url3 =
     Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
     response3 = await http.get(url3);
+
     print(response2.statusCode);
 
     print(response3.statusCode);
