@@ -4,6 +4,7 @@ import 'package:covidapp/adState.dart';
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/screens/boardingScreen.dart';
 import 'package:covidapp/screens/homeScreen.dart';
+import 'package:covidapp/screens/newsScreen.dart';
 import 'package:covidapp/userPrefs.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

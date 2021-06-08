@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/boardingScreen.dart';
@@ -29,12 +30,51 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-
 String userDistrict;
 String userState;
 String userDistrictCode;
 String userStateCode;
 DateTime _today = DateTime.now();
+
+//homeicfunctions
+
+String homeICGraphpreviousDates(int x) {
+  DateTime pvDate = _today.subtract(Duration(days: x));
+
+  var outFormatter = new DateFormat('yyyy-MM-dd');
+  return outFormatter.format(pvDate);
+}
+double homeICGraphgetValues(int y,String item){
+
+  FirebaseFirestore.instance
+      .collection('${homeICGraphpreviousDates(y)}')
+      .doc('$userStateCode').collection('districts').doc('$userDistrict')
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+    Map<String, dynamic> data = documentSnapshot.data();
+    if (documentSnapshot.exists) {
+
+      return data['delta']['$item']==null?0:double.parse(data['delta']['$item'].toString());
+
+
+    } else {
+      return 0;
+    }
+
+
+  });
+
+
+}
+
+
+
+
+
+
+
+//homeicfunctions
+
 
 String formatdate(DateTime date) {
   var outFormatter = new DateFormat('yyyy-MM-dd');
@@ -47,14 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return MobileAds.instance.initialize();
   }
 
-
-
   @override
   void initState() {
     userDistrict = UserPreferences().districtName;
     userState = UserPreferences().stateName;
     userDistrictCode = UserPreferences().districtCode;
     userStateCode = UserPreferences().stateCode;
+
+
 
     // TODO: implement initState
     super.initState();
@@ -96,51 +136,52 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(left: 8, bottom: 10),
                     child: !download
                         ? Container(
-                      width: maxWidth,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Shimmer.fromColors(
-                      baseColor: shimmerbasecolor,
-                      highlightColor: shimmerhighlightcolor,
-                      child: Container(
-                              height: 25,
-                              width: maxWidth*0.4,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                      ),
-                    ),
-                            ],
-                          ),
-                        )
-                        :GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ChangeUserLocation()));
-                      },
-                      child: Container(
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              color: iconGrey,
-                              size: 28,
+                            width: maxWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Shimmer.fromColors(
+                                  baseColor: shimmerbasecolor,
+                                  highlightColor: shimmerhighlightcolor,
+                                  child: Container(
+                                    height: 25,
+                                    width: maxWidth * 0.4,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              userDistrict,
-                              style: TextStyle(
-                                  color: primaryText,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ChangeUserLocation()));
+                            },
+                            child: Container(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    color: iconGrey,
+                                    size: 28,
+                                  ),
+                                  Text(
+                                    userDistrict,
+                                    style: TextStyle(
+                                        color: primaryText,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                   ),
                   Wrap(
                     runSpacing: 10,
@@ -160,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "Deceased",
                         iconColor: coronaRed,
                         today: _today,
+
                         item: "deceased",
                         homeInfoCardPage: DistrictScreen(
                           district: userDistrict,
@@ -169,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Recovered",
                         iconColor: coronaGreen,
+
                         today: _today,
                         item: "recovered",
                         homeInfoCardPage: DistrictScreen(
@@ -179,6 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Vaccinated",
                         iconColor: coronaBlue,
+
                         today: _today,
                         item: "vaccinated2",
                         homeInfoCardPage: VaccinationDistrictScreen(
@@ -204,11 +248,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           buttonIcon: Icons.bar_chart,
                           homeButtonPage: StatusScreen()),
                       homeButton(
-                        title: "News",
-                        buttonIcon: Icons.article,
+                          title: "News",
+                          buttonIcon: Icons.article,
                           homeButtonPage: NewsScreen()),
-
-
                       homeButton(
                         title: "Vaccination",
                         buttonIcon: Icons.medical_services_rounded,
@@ -366,84 +408,90 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   !download
                       ? Shimmer.fromColors(
-                    baseColor: shimmerbasecolor,
-                    highlightColor: shimmerhighlightcolor,
-                    child: Container(
-                      height: maxHeight * 0.2,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  )
-                      :GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => IndiaScreen()));
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: bgGrey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 16.0, left: 10, bottom: 20, right: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          baseColor: shimmerbasecolor,
+                          highlightColor: shimmerhighlightcolor,
+                          child: Container(
+                            height: maxHeight * 0.2,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => IndiaScreen()));
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: bgGrey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "India",
-                                      style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: primaryText),
-                                    ),
-                                  ],
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 16.0,
+                                      left: 10,
+                                      bottom: 20,
+                                      right: 8),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "India",
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: primaryText),
+                                          ),
+                                        ],
+                                      ),
+                                      Icon(Icons.arrow_right)
+                                    ],
+                                  ),
                                 ),
-                                Icon(Icons.arrow_right)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 26, left: 10, right: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RowItem(
+                                        mapResponseInRow: mapResponse,
+                                        txColor: cardYellow,
+                                        txHeading: "CONFIRMED",
+                                        item: "confirmed",
+                                      ),
+                                      RowItem(
+                                        mapResponseInRow: mapResponse,
+                                        txColor: cardGreen,
+                                        txHeading: "RECOVERED",
+                                        item: "recovered",
+                                      ),
+                                      RowItem(
+                                        mapResponseInRow: mapResponse,
+                                        txColor: primaryRed,
+                                        txHeading: "DECEASED",
+                                        item: "deceased",
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 26, left: 10, right: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                RowItem(
-                                  mapResponseInRow: mapResponse,
-                                  txColor: cardYellow,
-                                  txHeading: "CONFIRMED",
-                                  item: "confirmed",
-                                ),
-                                RowItem(
-                                  mapResponseInRow: mapResponse,
-                                  txColor: cardGreen,
-                                  txHeading: "RECOVERED",
-                                  item: "recovered",
-                                ),
-                                RowItem(
-                                  mapResponseInRow: mapResponse,
-                                  txColor: primaryRed,
-                                  txHeading: "DECEASED",
-                                  item: "deceased",
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
                 ],
               ),
             ),
@@ -581,6 +629,7 @@ class HomeInfoCard extends StatelessWidget {
   final String item;
   final DateTime today;
   final Widget homeInfoCardPage;
+  final List<FlSpot> graph;
 
   const HomeInfoCard({
     Key key,
@@ -588,7 +637,7 @@ class HomeInfoCard extends StatelessWidget {
     this.iconColor,
     this.item,
     this.today,
-    this.homeInfoCardPage,
+    this.homeInfoCardPage, this.graph,
   }) : super(key: key);
 
   String formatDate(DateTime date) {
@@ -666,23 +715,88 @@ class HomeInfoCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(
                                 bottom: 10.0, left: 10, right: 10),
-                            child: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(color: primaryText),
-                                  children: [
-                                    TextSpan(
-                                        text:
-                                            "${NumberFormat.decimalPattern().format(int.parse(numberOfPeople()))}\n",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold)),
-                                    TextSpan(
-                                        text: "People",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          height: 1,
-                                        ))
-                                  ]),
+                            child: FutureBuilder<DocumentSnapshot>(
+                              future: FirebaseFirestore.instance
+                                  .collection('${formatDate(today)}')
+                                  .doc('$userStateCode')
+                                  .collection('districts')
+                                  .doc('$userDistrict')
+                                  .get(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+
+
+                                if (snapshot.hasData && !snapshot.data.exists) {
+                                  return FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('${formatDate(today.subtract(Duration(days: 1)))}')
+                                        .doc('$userStateCode')
+                                        .collection('districts')
+                                        .doc('$userDistrict')
+                                        .get(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<DocumentSnapshot> snapshot) {
+
+
+                                      if (snapshot.hasData && !snapshot.data.exists) {
+                                        return Text("0");
+                                      }
+
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        Map<String, dynamic> data =
+                                        snapshot.data.data();
+                                        return RichText(
+                                          text: TextSpan(
+                                              style: TextStyle(color: primaryText),
+                                              children: [
+                                                TextSpan(
+                                                    text:data['delta']['$item']==null?"0\n":
+                                                    "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight: FontWeight.bold)),
+                                                TextSpan(
+                                                    text: "People",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      height: 1,
+                                                    ))
+                                              ]),
+                                        );
+                                      }
+
+                                      return Text("loading");
+                                    },
+                                  );
+                                }
+
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  Map<String, dynamic> data =
+                                      snapshot.data.data();
+                                  return RichText(
+                                    text: TextSpan(
+                                        style: TextStyle(color: primaryText),
+                                        children: [
+                                          TextSpan(
+                                              text:data['delta']['$item']==null?"0":
+                                              "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold)),
+                                          TextSpan(
+                                              text: "People",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                height: 1,
+                                              ))
+                                        ]),
+                                  );
+                                }
+
+                                return Text("loading");
+                              },
                             ),
                           ),
                           Expanded(
@@ -696,7 +810,7 @@ class HomeInfoCard extends StatelessWidget {
                                       LineChartBarData(
                                           barWidth: 3,
                                           colors: [primaryRed],
-                                          spots: getGraphData(),
+                                          spots: getGraph(),
                                           isCurved: true,
                                           dotData: FlDotData(show: false),
                                           belowBarData:
@@ -713,94 +827,23 @@ class HomeInfoCard extends StatelessWidget {
     });
   }
 
-  String previousDates(int x) {
-    DateTime pvDate = _today.subtract(Duration(days: x));
-
-    var outFormatter = new DateFormat('yyyy-MM-dd');
-    return outFormatter.format(pvDate);
-  }
-
-  double getData(int y) {
-    if (mapResponse == null)
-      return 0;
-    else if (mapResponse['${previousDates(y)}'] == null) {
-      return 0;
-    } else if (mapResponse['${previousDates(y)}']['$userStateCode'] == null) {
-      return 0;
-    } else if (mapResponse['${previousDates(y)}']['$userStateCode']
-            ['districts'] ==
-        null) {
-      return 0;
-    } else if (mapResponse['${previousDates(y)}']['$userStateCode']['districts']
-            ['$userDistrict'] ==
-        null) {
-      return 0;
-    } else if (mapResponse['${previousDates(y)}']['$userStateCode']['districts']
-            ['$userDistrict']["delta"] ==
-        null) {
-      return 0;
-    } else if (mapResponse['${previousDates(y)}']['$userStateCode']['districts']
-            ['$userDistrict']["delta"]["$item"] ==
-        null) {
-      return 0;
-    } else
-      return double.parse(mapResponse['${previousDates(y)}']['$userStateCode']
-              ['districts']['$userDistrict']["delta"]["$item"]
-          .toString());
-  }
-
-  String numberOfPeople() {
-    if (itemNumber(_today) == "0") {
-      if (itemNumber(_today.subtract(Duration(days: 1))) == "0") {
-        return "0";
-      } else {
-        return itemNumber(_today.subtract(Duration(days: 1)));
-      }
-    } else {
-      return itemNumber(_today);
-    }
-  }
-
-  String itemNumber(DateTime date) {
-    if (mapResponse == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}'] == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}']['$userStateCode'] == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}']['$userStateCode']
-            ['districts'] ==
-        null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}']['$userStateCode']['districts']
-            ['$userDistrict'] ==
-        null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}']['$userStateCode']['districts']
-            ['$userDistrict']["delta"] ==
-        null) {
-      return 0.toString();
-    } else if (mapResponse['${formatDate(date)}']['$userStateCode']['districts']
-            ['$userDistrict']["delta"]["$item"] ==
-        null) {
-      return 0.toString();
-    } else
-      return mapResponse['${formatDate(date)}']['$userStateCode']['districts']
-              ['$userDistrict']["delta"]["$item"]
-          .toString();
-  }
-
-  List<FlSpot> getGraphData() {
+  List<FlSpot> getGraph() {
     return [
-      FlSpot(0, getData(6)),
-      FlSpot(1, getData(5)),
-      FlSpot(2, getData(4)),
-      FlSpot(3, getData(3)),
-      FlSpot(4, getData(2)),
-      FlSpot(5, getData(1)),
-      FlSpot(6, getData(0)),
+      FlSpot(0, homeICGraphgetValues(6,"$item")),
+      FlSpot(1, homeICGraphgetValues(5,"$item")),
+      FlSpot(2, homeICGraphgetValues(4,"$item")),
+      FlSpot(3, homeICGraphgetValues(3,"$item")),
+      FlSpot(4, homeICGraphgetValues(2,"$item")),
+      FlSpot(5, homeICGraphgetValues(1,"$item")),
+      FlSpot(6, homeICGraphgetValues(0,"$item")),
     ];
   }
+
+
+
+
+
+
 }
 
 class RowItem extends StatelessWidget {
