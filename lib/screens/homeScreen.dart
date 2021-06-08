@@ -44,37 +44,24 @@ String homeICGraphpreviousDates(int x) {
   var outFormatter = new DateFormat('yyyy-MM-dd');
   return outFormatter.format(pvDate);
 }
-double homeICGraphgetValues(int y,String item){
 
-  FirebaseFirestore.instance
-      .collection('${homeICGraphpreviousDates(y)}')
-      .doc('$userStateCode').collection('districts').doc('$userDistrict')
+Future<double> homeICGraphgetValues(int y, String item) async {
+  double _returnValue = 0;
+  await FirebaseFirestore.instance
+      .doc('${homeICGraphpreviousDates(y)}/$userStateCode/districts/$userDistrict')
       .get()
-      .then((DocumentSnapshot documentSnapshot) {
+      .then((documentSnapshot) {
     Map<String, dynamic> data = documentSnapshot.data();
     if (documentSnapshot.exists) {
-
-      return data['delta']['$item']==null?0:double.parse(data['delta']['$item'].toString());
-
-
-    } else {
-      return 0;
+      _returnValue = data['delta']['$item'] == null
+          ? 0
+          : double.parse(data['delta']['$item'].toString());
     }
-
-
   });
-
-
+  return _returnValue;
 }
 
-
-
-
-
-
-
 //homeicfunctions
-
 
 String formatdate(DateTime date) {
   var outFormatter = new DateFormat('yyyy-MM-dd');
@@ -93,8 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
     userState = UserPreferences().stateName;
     userDistrictCode = UserPreferences().districtCode;
     userStateCode = UserPreferences().stateCode;
-
-
 
     // TODO: implement initState
     super.initState();
@@ -201,7 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "Deceased",
                         iconColor: coronaRed,
                         today: _today,
-
                         item: "deceased",
                         homeInfoCardPage: DistrictScreen(
                           district: userDistrict,
@@ -211,7 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Recovered",
                         iconColor: coronaGreen,
-
                         today: _today,
                         item: "recovered",
                         homeInfoCardPage: DistrictScreen(
@@ -222,7 +205,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Vaccinated",
                         iconColor: coronaBlue,
-
                         today: _today,
                         item: "vaccinated2",
                         homeInfoCardPage: VaccinationDistrictScreen(
@@ -637,7 +619,8 @@ class HomeInfoCard extends StatelessWidget {
     this.iconColor,
     this.item,
     this.today,
-    this.homeInfoCardPage, this.graph,
+    this.homeInfoCardPage,
+    this.graph,
   }) : super(key: key);
 
   String formatDate(DateTime date) {
@@ -724,38 +707,42 @@ class HomeInfoCard extends StatelessWidget {
                                   .get(),
                               builder: (BuildContext context,
                                   AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-
                                 if (snapshot.hasData && !snapshot.data.exists) {
                                   return FutureBuilder<DocumentSnapshot>(
                                     future: FirebaseFirestore.instance
-                                        .collection('${formatDate(today.subtract(Duration(days: 1)))}')
+                                        .collection(
+                                            '${formatDate(today.subtract(Duration(days: 1)))}')
                                         .doc('$userStateCode')
                                         .collection('districts')
                                         .doc('$userDistrict')
                                         .get(),
                                     builder: (BuildContext context,
-                                        AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-
-                                      if (snapshot.hasData && !snapshot.data.exists) {
+                                        AsyncSnapshot<DocumentSnapshot>
+                                            snapshot) {
+                                      if (snapshot.hasData &&
+                                          !snapshot.data.exists) {
                                         return Text("0");
                                       }
 
                                       if (snapshot.connectionState ==
                                           ConnectionState.done) {
                                         Map<String, dynamic> data =
-                                        snapshot.data.data();
+                                            snapshot.data.data();
                                         return RichText(
                                           text: TextSpan(
-                                              style: TextStyle(color: primaryText),
+                                              style:
+                                                  TextStyle(color: primaryText),
                                               children: [
                                                 TextSpan(
-                                                    text:data['delta']['$item']==null?"0\n":
-                                                    "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
+                                                    text: data['delta']
+                                                                ['$item'] ==
+                                                            null
+                                                        ? "0\n"
+                                                        : "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
                                                     style: TextStyle(
                                                         fontSize: 18,
-                                                        fontWeight: FontWeight.bold)),
+                                                        fontWeight:
+                                                            FontWeight.bold)),
                                                 TextSpan(
                                                     text: "People",
                                                     style: TextStyle(
@@ -780,8 +767,10 @@ class HomeInfoCard extends StatelessWidget {
                                         style: TextStyle(color: primaryText),
                                         children: [
                                           TextSpan(
-                                              text:data['delta']['$item']==null?"0":
-                                              "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
+                                              text: data['delta']['$item'] ==
+                                                      null
+                                                  ? "0"
+                                                  : "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold)),
@@ -802,20 +791,31 @@ class HomeInfoCard extends StatelessWidget {
                           Expanded(
                             child: AspectRatio(
                                 aspectRatio: 3,
-                                child: LineChart(LineChartData(
-                                    gridData: FlGridData(show: false),
-                                    titlesData: FlTitlesData(show: false),
-                                    borderData: FlBorderData(show: false),
-                                    lineBarsData: [
-                                      LineChartBarData(
-                                          barWidth: 3,
-                                          colors: [primaryRed],
-                                          spots: getGraph(),
-                                          isCurved: true,
-                                          dotData: FlDotData(show: false),
-                                          belowBarData:
-                                              BarAreaData(show: false))
-                                    ]))),
+                                child: FutureBuilder(
+                                  future: getGraph(),
+                                  builder: (context, snapshot) {
+                                    if(snapshot.hasData){
+                                      return LineChart(LineChartData(
+                                        gridData: FlGridData(show: false),
+                                        titlesData: FlTitlesData(show: false),
+                                        borderData: FlBorderData(show: false),
+                                        lineBarsData: [
+                                          LineChartBarData(
+                                              barWidth: 3,
+                                              colors: [primaryRed],
+                                              spots: snapshot.data,
+                                              isCurved: true,
+                                              dotData: FlDotData(show: false),
+                                              belowBarData:
+                                                  BarAreaData(show: false))
+                                        ]));
+                                    }
+                                    if(snapshot.hasError){
+                                      return Center(child:Text('Error occured'));
+                                    }
+                                    return Center(child:CircularProgressIndicator());
+                                  }
+                                )),
                           )
                         ],
                       ),
@@ -827,23 +827,17 @@ class HomeInfoCard extends StatelessWidget {
     });
   }
 
-  List<FlSpot> getGraph() {
+  Future<List<FlSpot>> getGraph() async{
     return [
-      FlSpot(0, homeICGraphgetValues(6,"$item")),
-      FlSpot(1, homeICGraphgetValues(5,"$item")),
-      FlSpot(2, homeICGraphgetValues(4,"$item")),
-      FlSpot(3, homeICGraphgetValues(3,"$item")),
-      FlSpot(4, homeICGraphgetValues(2,"$item")),
-      FlSpot(5, homeICGraphgetValues(1,"$item")),
-      FlSpot(6, homeICGraphgetValues(0,"$item")),
+      FlSpot(0, await homeICGraphgetValues(6, "$item")),
+      FlSpot(1, await homeICGraphgetValues(5, "$item")),
+      FlSpot(2, await homeICGraphgetValues(4, "$item")),
+      FlSpot(3, await homeICGraphgetValues(3, "$item")),
+      FlSpot(4, await homeICGraphgetValues(2, "$item")),
+      FlSpot(5, await homeICGraphgetValues(1, "$item")),
+      FlSpot(6, await homeICGraphgetValues(0, "$item")),
     ];
   }
-
-
-
-
-
-
 }
 
 class RowItem extends StatelessWidget {
