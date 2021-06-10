@@ -157,69 +157,55 @@ class DataCard extends StatelessWidget {
     return Container(
       child: Padding(
         padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
-        child: Container(
-          height: maxHeight*0.2,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8, left: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    cardHeading,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+        child:FutureBuilder(
+            future: dCard(),
+            builder: (context, snapshot) {
+              if(snapshot.hasData){
+                return Container(
+                  height: maxHeight*0.2,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: FutureBuilder(
-                      future: itemNumber("delta"),
-                      builder: (context, snapshot) {
-                        if(snapshot.hasData){
-                          return Text(
-                              NumberFormat.decimalPattern().format(int.parse(snapshot.data))
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 8),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            cardHeading,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              NumberFormat.decimalPattern().format(int.parse(snapshot.data["delta"]))
 
                               ,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 35,
                                 fontWeight: FontWeight.bold,
-                              ))
-
-
-                          ;
-                        }
-                        if(snapshot.hasError){
-                          return Text("dfsdfs");
-                        }
-                        return Text("dfs");
-                      }
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: maxHeight*0.1,
-                    child: FutureBuilder(
-                        future: getGraph(),
-                        builder: (context, snapshot) {
-                          if(snapshot.hasData){
-                            return LineChart(LineChartData(
+                              )),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: maxHeight*0.1,
+                            child: LineChart(LineChartData(
                                 gridData: FlGridData(show: false),
                                 titlesData: FlTitlesData(show: false),
                                 borderData: FlBorderData(show: false),
@@ -227,43 +213,32 @@ class DataCard extends StatelessWidget {
                                   LineChartBarData(
                                       barWidth: 6,
                                       colors: [graphColor],
-                                      spots: snapshot.data,
+                                      spots: snapshot.data["graph"],
                                       isCurved: false,
                                       dotData: FlDotData(show: false),
                                       belowBarData: BarAreaData(show: false))
                                 ]))
-                            ;
-                          }
-                          if(snapshot.hasError){
-                            return Text("dfsdfs");
-                          }
-                          return Text("dfs");
-                        }
-                    ),
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 8),
-                    child: Text(
-                      "Total till Date",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                            ,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child:FutureBuilder(
-                          future: itemNumber("total"),
-                          builder: (context, snapshot) {
-                            if(snapshot.hasData){
-                              return Text( NumberFormat.decimalPattern().format(int.parse(snapshot.data))
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, left: 8),
+                            child: Text(
+                              "Total till Date",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child:Text( NumberFormat.decimalPattern().format(int.parse(snapshot.data["total"]))
 
                                   ,
                                   style: TextStyle(
@@ -271,24 +246,48 @@ class DataCard extends StatelessWidget {
                                     fontSize: 26,
                                     fontWeight: FontWeight.w500,
                                   ))
+                              ,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
 
-                              ;
-                            }
-                            if(snapshot.hasError){
-                              return Text("dfsdfs");
-                            }
-                            return Text("dfs");
-                          }
-                      ),
+              )
+
+
+
+              ;
+              }
+              if(snapshot.hasError){
+                return Shimmer.fromColors(
+                  baseColor: shimmerbasecolor,
+                  highlightColor: shimmerhighlightcolor,
+                  child: Container(
+                    height: maxHeight * 0.2,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+                );
+              }
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  height: maxHeight * 0.2,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }
+        )
+
+      ));
   }
 
   String previousDates(int x) {
@@ -329,13 +328,6 @@ class DataCard extends StatelessWidget {
     ];
   }
 
-
-
-
-
-
-
-
   Future<String> itemNumber(String deltaortotal) async{
     String _returnValue="0";
     await FirebaseFirestore.instance
@@ -353,6 +345,13 @@ class DataCard extends StatelessWidget {
       }
     });
     return _returnValue;
+  }
+
+  Future<Map> dCard() async{
+    Map abc={"delta":await itemNumber("delta"),
+      "total":await itemNumber("total"),
+    "graph":await getGraph()};
+    return abc;
   }
 
 

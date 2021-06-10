@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shimmer/shimmer.dart';
 
 class VaccinationScreen extends StatefulWidget {
   const VaccinationScreen({Key key}) : super(key: key);
@@ -323,9 +324,29 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                           ;
                         }
                         if(snapshot.hasError){
-                          return Text("dfsdfs");
+                          return Shimmer.fromColors(
+                            baseColor: shimmerbasecolor,
+                            highlightColor: shimmerhighlightcolor,
+                            child: Container(
+                              height: maxHeight * 0.24,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
                         }
-                        return Text("dfs");
+                        return Shimmer.fromColors(
+                          baseColor: shimmerbasecolor,
+                          highlightColor: shimmerhighlightcolor,
+                          child: Container(
+                            height: maxHeight * 0.24,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
                   ),
                   SizedBox(
@@ -349,16 +370,36 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                           ;
                         }
                         if(snapshot.hasError){
-                          return Text("dfsdfs");
+                          return Shimmer.fromColors(
+                            baseColor: shimmerbasecolor,
+                            highlightColor: shimmerhighlightcolor,
+                            child: Container(
+                              height: maxHeight * 0.24,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
                         }
-                        return Text("dfs");
+                        return Shimmer.fromColors(
+                          baseColor: shimmerbasecolor,
+                          highlightColor: shimmerhighlightcolor,
+                          child: Container(
+                            height: maxHeight * 0.24,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
                   ),
                   SizedBox(
                     height: 10,
                   ),
                   FutureBuilder(
-                      future: stateData(),
+                      future: indiaData(),
                       builder: (context, snapshot) {
                         if(snapshot.hasData){
                           return PercentageCard(
@@ -374,9 +415,29 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                         ;
                         }
                         if(snapshot.hasError){
-                          return Text("dfsdfs");
+                          return Shimmer.fromColors(
+                            baseColor: shimmerbasecolor,
+                            highlightColor: shimmerhighlightcolor,
+                            child: Container(
+                              height: maxHeight * 0.24,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
                         }
-                        return Text("dfs");
+                        return Shimmer.fromColors(
+                          baseColor: shimmerbasecolor,
+                          highlightColor: shimmerhighlightcolor,
+                          child: Container(
+                            height: maxHeight * 0.24,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
                       }
                   ),
                   SizedBox(

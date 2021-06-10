@@ -7,6 +7,7 @@ import 'package:covidapp/statesList.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class VaccinationIndiaScreen extends StatefulWidget {
@@ -84,65 +85,88 @@ class _VaccinationIndiaScreenState extends State<VaccinationIndiaScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Container(
-                  height: maxHeight * 0.35,
-                  decoration: BoxDecoration(
-                    color: bgGrey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 16.0, left: 10, bottom: 20, right: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Vaccinated both",
-                                  style: TextStyle(
-                                      fontSize: 18, color: primaryText),
-                                ),
-                                FutureBuilder(
-                                    future: getTotalVAC(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Text(
+              child: FutureBuilder(
+                  future: getValues(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return Container(
+                          height: maxHeight * 0.35,
+                          decoration: BoxDecoration(
+                            color: bgGrey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0, left: 10, bottom: 20, right: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Vaccinated both",
+                                          style: TextStyle(
+                                              fontSize: 18, color: primaryText),
+                                        ),
+                                        Text(
                                           NumberFormat.decimalPattern()
-                                              .format(int.parse(snapshot.data)),
+                                              .format(int.parse(snapshot.data["data"])),
                                           style: TextStyle(
                                               fontSize: 20,
                                               color: primaryText,
                                               fontWeight: FontWeight.bold),
-                                        );
-                                      }
-                                      if (snapshot.hasError) {
-                                        return Text("dfsdfs");
-                                      }
-                                      return Text("dfs");
-                                    }),
-                              ],
-                            ),
-                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: AspectRatio(
+                                      aspectRatio: 2,
+                                      child: StateChart(
+                                        graph: snapshot.data["graph"],
+                                      )),
+                                ),
+                              ),
+                            ],
+                          ))
+
+
+                      ;
+                    }
+                    if(snapshot.hasError){
+                      return Shimmer.fromColors(
+                        baseColor: shimmerbasecolor,
+                        highlightColor: shimmerhighlightcolor,
+                        child: Container(
+                          height: maxHeight * 0.35,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+                    return Shimmer.fromColors(
+                      baseColor: shimmerbasecolor,
+                      highlightColor: shimmerhighlightcolor,
+                      child: Container(
+                        height: maxHeight * 0.35,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: AspectRatio(
-                              aspectRatio: 2,
-                              child: StateChart(
-                                dateInString: formatDate(),
-                                date: _selectedDay,
-                              )),
-                        ),
-                      ),
-                    ],
-                  )),
+                    );
+                  }
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(
@@ -226,133 +250,9 @@ class _VaccinationIndiaScreenState extends State<VaccinationIndiaScreen> {
     });
     return _returnValue;
   }
-}
-
-class StateCard extends StatelessWidget {
-  final StateList state;
-  final VoidCallback onTap;
-  final StateList item;
-  final bool selected;
-  final String date;
-
-  const StateCard(
-      {Key key, this.onTap, this.item, this.selected, this.date, this.state})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.display1;
-    // if (selected)
-    //   textStyle = textStyle.copyWith(color: Colors.lightGreenAccent[400]);
-    return InkWell(
-      onTap: () {
-        onTap();
-      },
-      child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: bgWhite,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding:
-                const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  state.stateName,
-                  style: null,
-                  textAlign: TextAlign.left,
-                ),
-                Row(
-                  children: [
-                    FutureBuilder(
-                        future: itemNumber(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text(
-                              NumberFormat.decimalPattern()
-                                  .format(int.parse(snapshot.data)),
-                              style: null,
-                              textAlign: TextAlign.left,
-                            );
-                          }
-                          if (snapshot.hasError) {
-                            return Text("dfsdfs");
-                          }
-                          return Text("dfs");
-                        }),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: primaryRed,
-                      size: 16,
-                    )
-                  ],
-                )
-              ],
-              crossAxisAlignment: CrossAxisAlignment.start,
-            ),
-          )),
-    );
-  }
-
-  Future<String> itemNumber() async {
-    String _returnValue = "0";
-    await FirebaseFirestore.instance
-        .doc('$date/${state.stateCode}')
-        .get()
-        .then((documentSnapshot) {
-      Map<String, dynamic> data = documentSnapshot.data();
-      if (documentSnapshot.exists) {
-        _returnValue = data == null ||
-                data['total'] == null ||
-                data['total']['vaccinated2'] == null
-            ? "0"
-            : data['total']['vaccinated2'].toString();
-      } else {
-        _returnValue = "0";
-      }
-    });
-    return _returnValue;
-  }
-}
-
-class StateChart extends StatelessWidget {
-  final String dateInString;
-  final DateTime date;
-
-  const StateChart({Key key, this.date, this.dateInString}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getGraphData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return LineChart(LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                      barWidth: 6,
-                      colors: [primaryRed],
-                      spots: snapshot.data,
-                      isCurved: false,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: false))
-                ]));
-          }
-          if (snapshot.hasError) {
-            return Text("dfsdfs");
-          }
-          return Text("dfs");
-        });
-  }
 
   String previousDates(int x) {
-    DateTime pvDate = date.subtract(Duration(days: x));
+    DateTime pvDate = _selectedDay.subtract(Duration(days: x));
 
     var outFormatter = new DateFormat('yyyy-MM-dd');
     return outFormatter.format(pvDate);
@@ -367,8 +267,8 @@ class StateChart extends StatelessWidget {
       Map<String, dynamic> data = documentSnapshot.data();
       if (documentSnapshot.exists) {
         _returnValue = data == null ||
-                data['total'] == null ||
-                data['total']['vaccinated2'] == null
+            data['total'] == null ||
+            data['total']['vaccinated2'] == null
             ? 0
             : double.parse(data['total']['vaccinated2'].toString());
       } else {
@@ -412,4 +312,154 @@ class StateChart extends StatelessWidget {
       FlSpot(29, await getData(0)),
     ];
   }
+
+  Future<Map> getValues() async{
+    Map abc={
+      "data":await getTotalVAC(),
+      "graph":await getGraphData()
+
+    };
+    return abc;
+  }
+
+
+}
+
+class StateCard extends StatelessWidget {
+  final StateList state;
+  final VoidCallback onTap;
+  final StateList item;
+  final bool selected;
+  final String date;
+
+  const StateCard(
+      {Key key, this.onTap, this.item, this.selected, this.date, this.state})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.display1;
+    // if (selected)
+    //   textStyle = textStyle.copyWith(color: Colors.lightGreenAccent[400]);
+    return FutureBuilder(
+        future: itemNumber(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return InkWell(
+              onTap: () {
+                onTap();
+              },
+              child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: bgWhite,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          state.stateName,
+                          style: null,
+                          textAlign: TextAlign.left,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              NumberFormat.decimalPattern()
+                                  .format(int.parse(snapshot.data)),
+                              style: null,
+                              textAlign: TextAlign.left,
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: primaryRed,
+                              size: 16,
+                            )
+                          ],
+                        )
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  )),
+            )
+
+
+            ;
+          }
+          if(snapshot.hasError){
+            return Shimmer.fromColors(
+              baseColor: shimmerbasecolor,
+              highlightColor: shimmerhighlightcolor,
+              child: Container(
+                height:40,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+          return Shimmer.fromColors(
+            baseColor: shimmerbasecolor,
+            highlightColor: shimmerhighlightcolor,
+            child: Container(
+              height:40,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
+    );
+  }
+
+  Future<String> itemNumber() async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('$date/${state.stateCode}')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null ||
+                data['total'] == null ||
+                data['total']['vaccinated2'] == null
+            ? "0"
+            : data['total']['vaccinated2'].toString();
+      } else {
+        _returnValue = "0";
+      }
+    });
+    return _returnValue;
+  }
+}
+
+class StateChart extends StatelessWidget {
+  final List<FlSpot> graph;
+
+  const StateChart({Key key, this.graph, }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return  LineChart(LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                      barWidth: 6,
+                      colors: [primaryRed],
+                      spots: graph,
+                      isCurved: false,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false))
+                ]));
+  }
+
+
 }

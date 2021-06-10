@@ -36,7 +36,7 @@ bool download = false;
 
 class _MyAppState extends State<MyApp> {
 
-  Future fetchData() async {
+  Future fetchWorldData() async {
     http.Response response2;
     var url2 = Uri.parse("https://coronavirus-19-api.herokuapp.com/countries");
     response2 = await http.get(url2);
@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   void initState() {
-    fetchData();
+    fetchWorldData();
 
 
     // TODO: implement initState

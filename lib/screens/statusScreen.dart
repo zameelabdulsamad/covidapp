@@ -53,62 +53,93 @@ class _StatusScreenState extends State<StatusScreen> {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DistrictScreen(
-                                        district: district,
-                                        state: stateCode,
-                                      )));
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: bgGrey,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 16.0,
-                                      left: 10,
-                                      bottom: 20,
-                                      right: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            district,
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: primaryText),
+                      child: FutureBuilder(
+                          future: getBarGroups(),
+                          builder: (context, snapshot) {
+                            if(snapshot.hasData){
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => DistrictScreen(
+                                            district: district,
+                                            state: stateCode,
+                                          )));
+                                },
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      color: bgGrey,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 16.0,
+                                              left: 10,
+                                              bottom: 20,
+                                              right: 8),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    district,
+                                                    style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: primaryText),
+                                                  ),
+                                                ],
+                                              ),
+                                              Icon(Icons.arrow_right)
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Icon(Icons.arrow_right)
-                                    ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(24.0),
+                                          child: DistrictWeekChart(
+                                            graph: snapshot.data,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              )
+
+
+                              ;
+                            }
+                            if(snapshot.hasError){
+                              return Shimmer.fromColors(
+                                baseColor: shimmerbasecolor,
+                                highlightColor: shimmerhighlightcolor,
+                                child: Container(
+                                  height: maxHeight *  0.35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: DistrictWeekChart(
-                                    date: today,
-                                    dateInString: formatDate(),
-                                    state: stateCode,
-                                    district: district,
-                                  ),
+                              );
+                            }
+                            return Shimmer.fromColors(
+                              baseColor: shimmerbasecolor,
+                              highlightColor: shimmerhighlightcolor,
+                              child: Container(
+                                height: maxHeight * 0.35,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
-                            )),
+                              ),
+                            );
+                          }
                       ),
                     ),
                     SizedBox(
@@ -199,135 +230,215 @@ class _StatusScreenState extends State<StatusScreen> {
               SizedBox(
                 height: 10,
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => StateScreen(
-                                stateName: stateName,
-                                stateCode: stateCode,
-                              )));
-                },
-                child: Container(
-                    height: maxHeight * 0.35,
-                    decoration: BoxDecoration(
-                      color: bgGrey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 16.0, left: 10, bottom: 20, right: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    stateName,
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: primaryText),
+              FutureBuilder(
+                  future: getGraphData(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StateScreen(
+                                    stateName: stateName,
+                                    stateCode: stateCode,
+                                  )));
+                        },
+                        child: Container(
+                            height: maxHeight * 0.35,
+                            decoration: BoxDecoration(
+                              color: bgGrey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 16.0, left: 10, bottom: 20, right: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            stateName,
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: primaryText),
+                                          ),
+                                        ],
+                                      ),
+                                      Icon(Icons.arrow_right)
+                                    ],
                                   ),
-                                ],
-                              ),
-                              Icon(Icons.arrow_right)
-                            ],
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: AspectRatio(
+                                        aspectRatio: 2,
+                                        child: StateChart(
+                                          graph: snapshot.data,
+                                        )),
+                                  ),
+                                ),
+                              ],
+                            )),
+                      )
+
+
+                      ;
+                    }
+                    if(snapshot.hasError){
+                      return Shimmer.fromColors(
+                        baseColor: shimmerbasecolor,
+                        highlightColor: shimmerhighlightcolor,
+                        child: Container(
+                          height: maxHeight * 0.35,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AspectRatio(
-                                aspectRatio: 2,
-                                child: StateChart(
-                                  state: stateCode,
-                                  dateInString: formatDate(),
-                                  date: today,
-                                )),
-                          ),
+                      );
+                    }
+                    return Shimmer.fromColors(
+                      baseColor: shimmerbasecolor,
+                      highlightColor: shimmerhighlightcolor,
+                      child: Container(
+                        height: maxHeight * 0.35,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    )),
+                      ),
+                    );
+                  }
               ),
               Padding(
                 padding: const EdgeInsets.only(
                   top: 8,
                 ),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => IndiaScreen()));
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: bgGrey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 16.0, left: 10, bottom: 20, right: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "India",
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: primaryText),
+                child:FutureBuilder(
+                    future: rowValue(),
+                    builder: (context, snapshot) {
+                      if(snapshot.hasData){
+                        return  GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => IndiaScreen()));
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: bgGrey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 16.0, left: 10, bottom: 20, right: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "India",
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: primaryText),
+                                          ),
+                                        ],
+                                      ),
+                                      Icon(Icons.arrow_right)
+                                    ],
                                   ),
-                                ],
-                              ),
-                              Icon(Icons.arrow_right)
-                            ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 26, left: 10, right: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RowItem(
+                                        txColor: cardYellow,
+                                        txHeading: "CONFIRMED",
+                                        totalNumber: snapshot.data["totalconfirmed"],
+                                        deltaNumber: snapshot.data["deltaconfirmed"],                                      ),
+                                      RowItem(
+                                        txColor: cardGreen,
+                                        txHeading: "RECOVERED",
+                                        totalNumber: snapshot.data["totalrecovered"],
+                                        deltaNumber: snapshot.data["deltarecovered"],
+                                      ),
+                                      RowItem(
+                                        txColor: primaryRed,
+                                        txHeading: "DECEASED",
+                                        totalNumber: snapshot.data["totaldeceased"],
+                                        deltaNumber: snapshot.data["deltadeceased"],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+
+
+                        ;
+                      }
+                      if(snapshot.hasError){
+                        return Shimmer.fromColors(
+                          baseColor: shimmerbasecolor,
+                          highlightColor: shimmerhighlightcolor,
+                          child: Container(
+                            height: maxHeight * 0.15,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+                      return Shimmer.fromColors(
+                        baseColor: shimmerbasecolor,
+                        highlightColor: shimmerhighlightcolor,
+                        child: Container(
+                          height: maxHeight * 0.15,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 26, left: 10, right: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              RowItem(
-                                txColor: cardYellow,
-                                txHeading: "CONFIRMED",
-                                item: "confirmed",
-                              ),
-                              RowItem(
-                                txColor: cardGreen,
-                                txHeading: "RECOVERED",
-                                item: "recovered",
-                              ),
-                              RowItem(
-                                txColor: primaryRed,
-                                txHeading: "DECEASED",
-                                item: "deceased",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      );
+                    }
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 8,
+                ),
+                child: !download?Container(
+                  child: Shimmer.fromColors(
+                    baseColor: shimmerbasecolor,
+                    highlightColor: shimmerhighlightcolor,
+                    child: Container(
+                      height: maxHeight * 0.15,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8,
-                ),
-                child: GestureDetector(
+                ):GestureDetector(
                   onTap: () {
                     Navigator.push(
                         context,
@@ -467,66 +578,20 @@ class _StatusScreenState extends State<StatusScreen> {
       ),
     );
   }
-}
-
-class DistrictWeekChart extends StatelessWidget {
-  final String state;
-  final String dateInString;
-  final DateTime date;
-  final String district;
-
-  const DistrictWeekChart(
-      {Key key,
-      this.state,
-      this.dateInString,
-      this.date,
-      this.district})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          AspectRatio(
-              aspectRatio: 1.4,
-              child: FutureBuilder(
-                  future: getBarGroups(),
-                  builder: (context, snapshot) {
-                    if(snapshot.hasData){
-                      return BarChart(BarChartData(
-                          barGroups: snapshot.data,
-                          borderData: FlBorderData(show: false),
-                          titlesData: FlTitlesData(
-                            leftTitles: SideTitles(showTitles: false),
-                            bottomTitles: SideTitles(showTitles: false),
-                          )));
-
-                    }
-                    if(snapshot.hasError){
-                      return Text("fhj");
-                    }
-                    return Text("fdvn");;
-                  }
-              ))
-        ],
-      ),
-    );
-  }
-
   String previousDates(int x) {
-    DateTime pvDate = date.subtract(Duration(days: x));
+    DateTime pvDate = today.subtract(Duration(days: x));
 
     var outFormatter = new DateFormat('yyyy-MM-dd');
     return outFormatter.format(pvDate);
   }
 
 
+//districtcard
 
   Future<double> getData(int y) async {
     double _returnValue = 0;
     await FirebaseFirestore.instance
-        .doc('${previousDates(y)}/$state/districts/$district')
+        .doc('${previousDates(y)}/$stateCode/districts/$district')
         .get()
         .then((documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data();
@@ -554,66 +619,20 @@ class DistrictWeekChart extends StatelessWidget {
     ];
     List<BarChartGroupData> barChartGroups = [];
     barChartDatas.asMap().forEach(
-        (i, value) => barChartGroups.add(BarChartGroupData(x: i, barRods: [
-              BarChartRodData(y: value, colors: [primaryRed], width: 16)
-            ])));
+            (i, value) => barChartGroups.add(BarChartGroupData(x: i, barRods: [
+          BarChartRodData(y: value, colors: [primaryRed], width: 16)
+        ])));
     return barChartGroups;
   }
-}
 
-class StateChart extends StatelessWidget {
-  final String state;
-  final String dateInString;
-  final DateTime date;
+//districtcard
 
-  const StateChart(
-      {Key key,
-      this.state,
-      this.date,
-      this.dateInString})
-      : super(key: key);
+//statecard
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getGraphData(),
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-            return LineChart(LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                      barWidth: 6,
-                      colors: [primaryRed],
-                      spots: snapshot.data,
-                      isCurved: false,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: false))
-                ]))
-            ;
-          }
-          if(snapshot.hasError){
-            return Text("fdj");
-          }
-          return Text("fdf");
-        }
-    );
-  }
-
-  String previousDates(int x) {
-    DateTime pvDate = date.subtract(Duration(days: x));
-
-    var outFormatter = new DateFormat('yyyy-MM-dd');
-    return outFormatter.format(pvDate);
-  }
-
-
-  Future<double> getData(int y) async {
+  Future<double> getstateData(int y) async {
     double _returnValue = 0;
     await FirebaseFirestore.instance
-        .doc('${previousDates(y)}/$state')
+        .doc('${previousDates(y)}/$stateCode')
         .get()
         .then((documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data();
@@ -631,151 +650,58 @@ class StateChart extends StatelessWidget {
 
   Future<List<FlSpot>> getGraphData() async{
     return [
-      FlSpot(0, await getData(29)),
-      FlSpot(1, await getData(28)),
-      FlSpot(2, await getData(27)),
-      FlSpot(3, await getData(26)),
-      FlSpot(4, await getData(25)),
-      FlSpot(5, await getData(24)),
-      FlSpot(6, await getData(23)),
-      FlSpot(7, await getData(22)),
-      FlSpot(8, await getData(21)),
-      FlSpot(9, await getData(20)),
-      FlSpot(10, await getData(19)),
-      FlSpot(11, await getData(18)),
-      FlSpot(12, await getData(17)),
-      FlSpot(13, await getData(16)),
-      FlSpot(14, await getData(15)),
-      FlSpot(15, await getData(14)),
-      FlSpot(16, await getData(13)),
-      FlSpot(17, await getData(12)),
-      FlSpot(18, await getData(11)),
-      FlSpot(19, await getData(10)),
-      FlSpot(20, await getData(9)),
-      FlSpot(21, await getData(8)),
-      FlSpot(22, await getData(7)),
-      FlSpot(23, await getData(6)),
-      FlSpot(24, await getData(5)),
-      FlSpot(25, await getData(4)),
-      FlSpot(26, await getData(3)),
-      FlSpot(27, await getData(2)),
-      FlSpot(28, await getData(1)),
-      FlSpot(29, await getData(0)),
+      FlSpot(0, await getstateData(29)),
+      FlSpot(1, await getstateData(28)),
+      FlSpot(2, await getstateData(27)),
+      FlSpot(3, await getstateData(26)),
+      FlSpot(4, await getstateData(25)),
+      FlSpot(5, await getstateData(24)),
+      FlSpot(6, await getstateData(23)),
+      FlSpot(7, await getstateData(22)),
+      FlSpot(8, await getstateData(21)),
+      FlSpot(9, await getstateData(20)),
+      FlSpot(10, await getstateData(19)),
+      FlSpot(11, await getstateData(18)),
+      FlSpot(12, await getstateData(17)),
+      FlSpot(13, await getstateData(16)),
+      FlSpot(14, await getstateData(15)),
+      FlSpot(15, await getstateData(14)),
+      FlSpot(16, await getstateData(13)),
+      FlSpot(17, await getstateData(12)),
+      FlSpot(18, await getstateData(11)),
+      FlSpot(19, await getstateData(10)),
+      FlSpot(20, await getstateData(9)),
+      FlSpot(21, await getstateData(8)),
+      FlSpot(22, await getstateData(7)),
+      FlSpot(23, await getstateData(6)),
+      FlSpot(24, await getstateData(5)),
+      FlSpot(25, await getstateData(4)),
+      FlSpot(26, await getstateData(3)),
+      FlSpot(27, await getstateData(2)),
+      FlSpot(28, await getstateData(1)),
+      FlSpot(29, await getstateData(0)),
     ];
   }
 
-}
 
-class RowItem extends StatelessWidget {
-  final Color txColor;
-  final String item;
-  final String txHeading;
-  final DateTime currentDate;
+//statecard
 
-  const RowItem(
-      {Key key,
-      this.txColor,
-      this.item,
-      this.txHeading,
-      this.currentDate})
-      : super(key: key);
+//indiacard
 
-  @override
-  Widget build(BuildContext context) {
-    double maxHeight = MediaQuery.of(context).size.height;
-    double maxWidth = MediaQuery.of(context).size.width;
-    return Column(
-      children: [
-        FutureBuilder(
-            future: finalNumber("delta"),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                    NumberFormat.decimalPattern()
-                        .format(int.parse(snapshot.data)),
-                    style: TextStyle(
-                      color: primaryText,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ));
-              }
-              if (snapshot.hasError) {
-                return Shimmer.fromColors(
-                  baseColor: shimmerbasecolor,
-                  highlightColor: shimmerhighlightcolor,
-                  child: Container(
-                    height: 20,
-                    width: maxWidth * 0.20,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              }
-              return Shimmer.fromColors(
-                baseColor: shimmerbasecolor,
-                highlightColor: shimmerhighlightcolor,
-                child: Container(
-                  height: 20,
-                  width: maxWidth * 0.20,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }),
-        Text(txHeading,
-            style: TextStyle(
-              color: txColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            )),
-        FutureBuilder(
-            future: finalNumber("total"),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                    NumberFormat.decimalPattern()
-                        .format(int.parse(snapshot.data)),
-                    style: TextStyle(
-                      color: primaryText,
-                      fontSize: 14,
-                    ));
-              }
-              if (snapshot.hasError) {
-                return Shimmer.fromColors(
-                  baseColor: shimmerbasecolor,
-                  highlightColor: shimmerhighlightcolor,
-                  child: Container(
-                    height: 15,
-                    width: maxWidth * 0.20,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              }
-              return Shimmer.fromColors(
-                baseColor: shimmerbasecolor,
-                highlightColor: shimmerhighlightcolor,
-                child: Container(
-                  height: 15,
-                  width: maxWidth * 0.20,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }),
-      ],
-    );
+  Future<Map> rowValue() async{
+    Map abc={
+      "deltaconfirmed":await finalNumber("delta", "confirmed"),
+      "totalconfirmed":await finalNumber("total", "confirmed"),
+      "deltarecovered":await finalNumber("delta", "recovered"),
+      "totalrecovered":await finalNumber("total", "recovered"),
+      "deltadeceased":await finalNumber("delta", "deceased"),
+      "totaldeceased":await finalNumber("total", "deceased"),
+
+    };
+    return abc;
   }
 
-  Future<String> finalNumber(String deltaortotal) async {
+  Future<String> finalNumber(String deltaortotal,String item) async {
     String abc;
 
     DateTime _today = DateTime.now();
@@ -784,38 +710,159 @@ class RowItem extends StatelessWidget {
       return outFormatter.format(day);
     }
 
-    if (await itemNumber(deltaortotal, formatDate(_today)) == "0") {
+    if (await itemNumber(deltaortotal, formatDate(_today),item) == "0") {
       if (await itemNumber(
-              deltaortotal, formatDate(_today.subtract(Duration(days: 1)))) ==
+          deltaortotal, formatDate(_today.subtract(Duration(days: 1))),item) ==
           "0") {
-        abc = 0.toString();
+        abc=  0.toString();
       } else {
-        abc = await itemNumber(
-            deltaortotal, formatDate(_today.subtract(Duration(days: 1))));
+        abc= await itemNumber(
+            deltaortotal, formatDate(_today.subtract(Duration(days: 1))),item);
       }
     } else {
-      abc = await itemNumber(deltaortotal, formatDate(_today));
+      abc= await  itemNumber(deltaortotal, formatDate(_today),item);
     }
     return abc;
   }
 
-  Future<String> itemNumber(String deltaortotal, String date) async {
-    String _returnValue = "0";
+
+
+
+  Future<String> itemNumber(String deltaortotal, String date,String item) async{
+    String _returnValue="0";
     await FirebaseFirestore.instance
         .doc('$date/TT/')
-        .get()
-        .then((documentSnapshot) {
+        .get().then((documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data();
       if (documentSnapshot.exists) {
-        _returnValue = (data == null ||
-                data['$deltaortotal'] == null ||
-                data['$deltaortotal']['$item'] == null)
-            ? 0.toString()
-            : _returnValue = data['$deltaortotal']['$item'].toString();
-      } else {
-        _returnValue = 0.toString();
+        _returnValue=(data == null ||data['$deltaortotal'] == null||data['$deltaortotal']['$item'] == null)?0.toString():_returnValue=data['$deltaortotal']['$item'].toString();
+
+
+      }
+      else{
+
+        _returnValue=0.toString();
       }
     });
     return _returnValue;
   }
+
+
+//indiacard
+
+
+
+
+
+}
+
+class DistrictWeekChart extends StatelessWidget {
+
+  final List<BarChartGroupData> graph;
+
+  const DistrictWeekChart(
+      {Key key, this.graph,
+      })
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          AspectRatio(
+              aspectRatio: 1.4,
+              child: BarChart(BarChartData(
+                          barGroups: graph,
+                          borderData: FlBorderData(show: false),
+                          titlesData: FlTitlesData(
+                            leftTitles: SideTitles(showTitles: false),
+                            bottomTitles: SideTitles(showTitles: false),
+                          ))))
+        ],
+      ),
+    );
+  }
+
+
+}
+
+class StateChart extends StatelessWidget {
+
+  final List<FlSpot> graph;
+
+  const StateChart(
+      {Key key, this.graph,
+      })
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LineChart(LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                      barWidth: 6,
+                      colors: [primaryRed],
+                      spots: graph,
+                      isCurved: false,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false))
+                ]))
+            ;
+  }
+
+
+
+
+
+}
+
+class RowItem extends StatelessWidget {
+  final Color txColor;
+  final String txHeading;
+  final String totalNumber;
+  final String deltaNumber;
+
+  const RowItem(
+      {Key key,
+      this.txColor,
+      this.txHeading, this.totalNumber, this.deltaNumber,
+      })
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+    double maxWidth = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(deltaNumber)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    )),
+        Text(txHeading,
+            style: TextStyle(
+              color: txColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            )),
+        Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(totalNumber)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 14,
+                    )),
+      ],
+    );
+  }
+
+
 }

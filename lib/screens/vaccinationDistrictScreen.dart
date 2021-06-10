@@ -5,6 +5,7 @@ import 'package:covidapp/screens/homeScreen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 class VaccinationDistrictScreen extends StatefulWidget {
   final String district;
@@ -82,72 +83,89 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
             SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 16,right: 16),
-              child: Container(
-                  height: maxHeight*0.35,
-                  decoration: BoxDecoration(
-                    color: bgGrey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 16.0, left: 10, bottom: 20, right: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Vaccinated both",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: primaryText),
-                                ),
-                                FutureBuilder(
-                                    future: getTotalVAC(),
-                                    builder: (context, snapshot) {
-                                      if(snapshot.hasData){
-                                        return Text(
-                                          NumberFormat.decimalPattern().format(int.parse(snapshot.data)),
+              child: FutureBuilder(
+                  future: getValues(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return Container(
+                          height: maxHeight*0.35,
+                          decoration: BoxDecoration(
+                            color: bgGrey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0, left: 10, bottom: 20, right: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Vaccinated both",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: primaryText),
+                                        ),
+                                        Text(
+                                          NumberFormat.decimalPattern().format(int.parse(snapshot.data["data"])),
                                           style: TextStyle(
                                               fontSize: 20,
                                               color: primaryText,
                                               fontWeight: FontWeight.bold),
 
-                                        )
-
-
-                                        ;
-                                      }
-                                      if(snapshot.hasError){
-                                        return Text("dfsdfs");
-                                      }
-                                      return Text("dfs");
-                                    }
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: AspectRatio(
+                                      aspectRatio: 2,
+                                      child: StateChart(
+                                          graph:snapshot.data["graph"]
+                                      )),
+                                ),
+                              ),
+                            ],
+                          ))
+
+
+                      ;
+                    }
+                    if(snapshot.hasError){
+                      return Shimmer.fromColors(
+                        baseColor: shimmerbasecolor,
+                        highlightColor: shimmerhighlightcolor,
+                        child: Container(
+                          height: maxHeight * 0.35,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+                    return Shimmer.fromColors(
+                      baseColor: shimmerbasecolor,
+                      highlightColor: shimmerhighlightcolor,
+                      child: Container(
+                        height: maxHeight * 0.35,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: AspectRatio(
-                              aspectRatio: 2,
-                              child: StateChart(
-                                state: widget.state,
-                                district: widget.district,
-                                dateInString: formatDate(),
-                                date: _selectedDay,
-                              )),
-                        ),
-                      ),
-                    ],
-                  )),
+                    );
+                  }
+              ),
             ),
 
 
@@ -179,56 +197,9 @@ class _VaccinationDistrictScreenState extends State<VaccinationDistrictScreen> {
     return _returnValue;
   }
 
-}
-
-
-
-class StateChart extends StatelessWidget {
-  final String district;
-  final String state;
-  final String dateInString;
-  final DateTime date;
-
-  const StateChart(
-      {Key key,
-        this.state,
-        this.date,
-        this.dateInString, this.district})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getGraphData(),
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-            return LineChart(LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                      barWidth: 6,
-                      colors: [primaryRed],
-                      spots: snapshot.data,
-                      isCurved: false,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: false))
-                ]))
-
-
-            ;
-          }
-          if(snapshot.hasError){
-            return Text("dfsdfs");
-          }
-          return Text("dfs");
-        }
-    );
-  }
 
   String previousDates(int x) {
-    DateTime pvDate = date.subtract(Duration(days: x));
+    DateTime pvDate = _selectedDay.subtract(Duration(days: x));
 
     var outFormatter = new DateFormat('yyyy-MM-dd');
     return outFormatter.format(pvDate);
@@ -241,7 +212,7 @@ class StateChart extends StatelessWidget {
   Future<double> getData(int y) async {
     double _returnValue = 0;
     await FirebaseFirestore.instance
-        .doc('${previousDates(y)}/$state/districts/$district')
+        .doc('${previousDates(y)}/${widget.state}/districts/${widget.district}')
         .get()
         .then((documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data();
@@ -293,6 +264,49 @@ class StateChart extends StatelessWidget {
       FlSpot(29, await getData(0)),
     ];
   }
+
+  Future<Map> getValues() async{
+    Map abc={
+      "data":await getTotalVAC(),
+      "graph":await getGraphData()
+
+    };
+    return abc;
+  }
+
+}
+
+
+
+class StateChart extends StatelessWidget {
+
+  final List<FlSpot> graph;
+
+  const StateChart(
+      {Key key, this.graph,
+        })
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LineChart(LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                      barWidth: 6,
+                      colors: [primaryRed],
+                      spots: graph,
+                      isCurved: false,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false))
+                ]))
+
+;
+  }
+
+
 }
 
 

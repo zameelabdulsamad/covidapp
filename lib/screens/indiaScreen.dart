@@ -31,6 +31,8 @@ class _IndiaScreenState extends State<IndiaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgGrey,
@@ -83,45 +85,76 @@ class _IndiaScreenState extends State<IndiaScreen> {
             Padding(
               padding: const EdgeInsets.only(
                   top: 16, left: 16, right: 16, bottom: 8),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: bgGrey,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 26, bottom: 26, left: 10, right: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      RowItem(
-                        date: formatDate(),
-                        txColor: cardYellow,
-                        state: "TT",
-                        txHeading: "CONFIRMED",
-                        item: "confirmed",
-                        currentDate: _selectedDay,
+              child: FutureBuilder(
+                  future: rowValue(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: bgGrey,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 26, bottom: 26, left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              RowItem(
+                                txColor: cardYellow,
+                                txHeading: "CONFIRMED",
+                                totalNumber: snapshot.data["totalconfirmed"],
+                                deltaNumber: snapshot.data["deltaconfirmed"],
+
+                              ),
+                              RowItem(
+                                txColor: cardGreen,
+                                txHeading: "RECOVERED",
+                                totalNumber: snapshot.data["totalrecovered"],
+                                deltaNumber: snapshot.data["deltarecovered"],
+
+                              ),
+                              RowItem(
+                                txColor: primaryRed,
+                                txHeading: "DECEASED",
+                                totalNumber: snapshot.data["totaldeceased"],
+                                deltaNumber: snapshot.data["deltadeceased"],
+
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+
+
+                      ;
+                    }
+                    if(snapshot.hasError){
+                      return Shimmer.fromColors(
+                        baseColor: shimmerbasecolor,
+                        highlightColor: shimmerhighlightcolor,
+                        child: Container(
+                          height: maxHeight * 0.15,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+                    return Shimmer.fromColors(
+                      baseColor: shimmerbasecolor,
+                      highlightColor: shimmerhighlightcolor,
+                      child: Container(
+                        height: maxHeight * 0.15,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      RowItem(
-                        date: formatDate(),
-                        txColor: cardGreen,
-                        state: "TT",
-                        txHeading: "RECOVERED",
-                        item: "recovered",
-                        currentDate: _selectedDay,
-                      ),
-                      RowItem(
-                        date: formatDate(),
-                        txColor: primaryRed,
-                        state: "TT",
-                        txHeading: "DECEASED",
-                        item: "deceased",
-                        currentDate: _selectedDay,
-                      ),
-                    ],
-                  ),
-                ),
+                    );
+                  }
               ),
             ),
             Padding(
@@ -185,6 +218,39 @@ class _IndiaScreenState extends State<IndiaScreen> {
       ),
     );
   }
+
+  Future<String> itemNumber(String deltaortotal,String item) async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('${formatDate()}/TT')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = (data == null ||
+            data['$deltaortotal'] == null ||
+            data['$deltaortotal']['$item'] == null)
+            ? 0.toString()
+            : _returnValue = data['$deltaortotal']['$item'].toString();
+      } else {
+        _returnValue = 0.toString();
+      }
+    });
+    return _returnValue;
+  }
+
+  Future<Map> rowValue() async{
+    Map abc={
+      "deltaconfirmed":await itemNumber("delta", "confirmed"),
+      "totalconfirmed":await itemNumber("total", "confirmed"),
+      "deltarecovered":await itemNumber("delta", "recovered"),
+      "totalrecovered":await itemNumber("total", "recovered"),
+      "deltadeceased":await itemNumber("delta", "deceased"),
+      "totaldeceased":await itemNumber("total", "deceased"),
+
+    };
+    return abc;
+  }
 }
 
 class StateCard extends StatelessWidget {
@@ -209,57 +275,79 @@ class StateCard extends StatelessWidget {
     TextStyle textStyle = Theme.of(context).textTheme.display1;
     // if (selected)
     //   textStyle = textStyle.copyWith(color: Colors.lightGreenAccent[400]);
-    return InkWell(
-      onTap: () {
-        onTap();
-      },
-      child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: bgWhite,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  state.stateName,
-                  style: null,
-                  textAlign: TextAlign.left,
-                ),
-                Row(
-                  children: [
-                    FutureBuilder(
-                        future: itemNumber(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text(
+    return FutureBuilder(
+        future: itemNumber(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return InkWell(
+              onTap: () {
+                onTap();
+              },
+              child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: bgWhite,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          state.stateName,
+                          style: null,
+                          textAlign: TextAlign.left,
+                        ),
+                        Row(
+                          children: [
+                            Text(
                               NumberFormat.decimalPattern()
                                   .format(int.parse(snapshot.data)),
                               style: null,
                               textAlign: TextAlign.left,
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: primaryRed,
+                              size: 16,
                             )
+                          ],
+                        )
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  )),
+            )
 
-                            ;
-                          }
-                          if (snapshot.hasError) {
-                            return Text("dfsdfs");
-                          }
-                          return Text("dfs");
-                        }),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: primaryRed,
-                      size: 16,
-                    )
-                  ],
-                )
-              ],
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+            ;
+          }
+          if(snapshot.hasError){
+            return Shimmer.fromColors(
+              baseColor: shimmerbasecolor,
+              highlightColor: shimmerhighlightcolor,
+              child: Container(
+                height:40,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+          return Shimmer.fromColors(
+            baseColor: shimmerbasecolor,
+            highlightColor: shimmerhighlightcolor,
+            child: Container(
+              height:40,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-          )),
+          );
+        }
     );
   }
 
@@ -288,20 +376,17 @@ class StateCard extends StatelessWidget {
 
 class RowItem extends StatelessWidget {
   final Color txColor;
-  final String item;
   final String txHeading;
-  final String state;
-  final String date;
-  final DateTime currentDate;
+
+
+  final String totalNumber;
+  final String deltaNumber;
 
   const RowItem(
       {Key key,
       this.txColor,
-      this.item,
-      this.txHeading,
-      this.state,
-      this.date,
-      this.currentDate})
+      this.txHeading, this.totalNumber, this.deltaNumber,
+      })
       : super(key: key);
 
   @override
@@ -310,112 +395,30 @@ class RowItem extends StatelessWidget {
     double maxWidth = MediaQuery.of(context).size.width;
     return Column(
       children: [
-        FutureBuilder(
-            future: itemNumber("delta"),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
+        Text(
                     NumberFormat.decimalPattern()
-                        .format(int.parse(snapshot.data)),
+                        .format(int.parse(deltaNumber)),
                     style: TextStyle(
                       color: primaryText,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                    ));
-              }
-              if (snapshot.hasError) {
-                return Shimmer.fromColors(
-                  baseColor: shimmerbasecolor,
-                  highlightColor: shimmerhighlightcolor,
-                  child: Container(
-                    height: 20,
-                    width: maxWidth * 0.20,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              }
-              return Shimmer.fromColors(
-                baseColor: shimmerbasecolor,
-                highlightColor: shimmerhighlightcolor,
-                child: Container(
-                  height: 20,
-                  width: maxWidth * 0.20,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }),
+                    )),
         Text(txHeading,
             style: TextStyle(
               color: txColor,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             )),
-        FutureBuilder(
-            future: itemNumber("total"),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
+        Text(
                     NumberFormat.decimalPattern()
-                        .format(int.parse(snapshot.data)),
+                        .format(int.parse(totalNumber)),
                     style: TextStyle(
                       color: primaryText,
                       fontSize: 14,
-                    ));
-              }
-              if (snapshot.hasError) {
-                return Shimmer.fromColors(
-                  baseColor: shimmerbasecolor,
-                  highlightColor: shimmerhighlightcolor,
-                  child: Container(
-                    height: 15,
-                    width: maxWidth * 0.20,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              }
-              return Shimmer.fromColors(
-                baseColor: shimmerbasecolor,
-                highlightColor: shimmerhighlightcolor,
-                child: Container(
-                  height: 15,
-                  width: maxWidth * 0.20,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }),
+                    )),
       ],
     );
   }
 
-  Future<String> itemNumber(String deltaortotal) async {
-    String _returnValue = "0";
-    await FirebaseFirestore.instance
-        .doc('$date/$state')
-        .get()
-        .then((documentSnapshot) {
-      Map<String, dynamic> data = documentSnapshot.data();
-      if (documentSnapshot.exists) {
-        _returnValue = (data == null ||
-                data['$deltaortotal'] == null ||
-                data['$deltaortotal']['$item'] == null)
-            ? 0.toString()
-            : _returnValue = data['$deltaortotal']['$item'].toString();
-      } else {
-        _returnValue = 0.toString();
-      }
-    });
-    return _returnValue;
-  }
+
 }

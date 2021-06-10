@@ -915,13 +915,12 @@ class RowItem extends StatelessWidget {
   final String txHeading;
   final String totalNumber;
   final String deltaNumber;
-  final DateTime currentDate;
 
   const RowItem(
       {Key key,
         this.txColor,
         this.txHeading,
-        this.currentDate, this.totalNumber, this.deltaNumber})
+         this.totalNumber, this.deltaNumber})
       : super(key: key);
 
   @override
