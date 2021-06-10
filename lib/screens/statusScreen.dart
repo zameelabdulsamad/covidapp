@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/indiaScreen.dart';
 import 'package:covidapp/screens/stateScreen.dart';
@@ -7,6 +7,7 @@ import 'package:covidapp/screens/worldWideScreen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import '../constants.dart';
 import 'districtScreen.dart';
 import 'homeScreen.dart';
@@ -19,8 +20,6 @@ class StatusScreen extends StatefulWidget {
 }
 
 class _StatusScreenState extends State<StatusScreen> {
-
-
   String district = userDistrict;
   String stateName = userState;
   String stateCode = userStateCode;
@@ -31,16 +30,9 @@ class _StatusScreenState extends State<StatusScreen> {
     return outFormatter.format(today);
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
-    double maxHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double maxHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +42,6 @@ class _StatusScreenState extends State<StatusScreen> {
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -67,8 +58,7 @@ class _StatusScreenState extends State<StatusScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      DistrictScreen(
+                                  builder: (context) => DistrictScreen(
                                         district: district,
                                         state: stateCode,
                                       )));
@@ -79,8 +69,7 @@ class _StatusScreenState extends State<StatusScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment
-                                  .spaceAround,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(
@@ -90,18 +79,17 @@ class _StatusScreenState extends State<StatusScreen> {
                                       right: 8),
                                   child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             district,
                                             style: TextStyle(
                                                 fontSize: 22,
-                                                fontWeight: FontWeight
-                                                    .bold,
+                                                fontWeight: FontWeight.bold,
                                                 color: primaryText),
                                           ),
                                         ],
@@ -113,7 +101,6 @@ class _StatusScreenState extends State<StatusScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(24.0),
                                   child: DistrictWeekChart(
-                                    mapResponseInCard: mapResponse,
                                     date: today,
                                     dateInString: formatDate(),
                                     state: stateCode,
@@ -141,7 +128,8 @@ class _StatusScreenState extends State<StatusScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       Icon(
                                         Icons.article,
@@ -180,8 +168,8 @@ class _StatusScreenState extends State<StatusScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
                                       children: [
                                         Icon(
                                           Icons.medical_services_rounded,
@@ -216,8 +204,7 @@ class _StatusScreenState extends State<StatusScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              StateScreen(
+                          builder: (context) => StateScreen(
                                 stateName: stateName,
                                 stateCode: stateCode,
                               )));
@@ -235,12 +222,10 @@ class _StatusScreenState extends State<StatusScreen> {
                           padding: const EdgeInsets.only(
                               top: 16.0, left: 10, bottom: 20, right: 8),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     stateName,
@@ -261,7 +246,6 @@ class _StatusScreenState extends State<StatusScreen> {
                             child: AspectRatio(
                                 aspectRatio: 2,
                                 child: StateChart(
-                                  mapResponseInCard: mapResponse,
                                   state: stateCode,
                                   dateInString: formatDate(),
                                   date: today,
@@ -278,8 +262,7 @@ class _StatusScreenState extends State<StatusScreen> {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(
-                            builder: (context) => IndiaScreen()));
+                        MaterialPageRoute(builder: (context) => IndiaScreen()));
                   },
                   child: Container(
                     width: double.infinity,
@@ -293,12 +276,10 @@ class _StatusScreenState extends State<StatusScreen> {
                           padding: const EdgeInsets.only(
                               top: 16.0, left: 10, bottom: 20, right: 8),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "India",
@@ -317,27 +298,23 @@ class _StatusScreenState extends State<StatusScreen> {
                           padding: const EdgeInsets.only(
                               bottom: 26, left: 10, right: 10),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               RowItem(
-                                mapResponseInRow: mapResponse,
                                 txColor: cardYellow,
                                 txHeading: "CONFIRMED",
                                 item: "confirmed",
-                                ),
+                              ),
                               RowItem(
-                                mapResponseInRow: mapResponse,
                                 txColor: cardGreen,
                                 txHeading: "RECOVERED",
                                 item: "recovered",
-                                ),
+                              ),
                               RowItem(
-                                mapResponseInRow: mapResponse,
                                 txColor: primaryRed,
                                 txHeading: "DECEASED",
                                 item: "deceased",
-                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -369,12 +346,10 @@ class _StatusScreenState extends State<StatusScreen> {
                           padding: const EdgeInsets.only(
                               top: 16.0, left: 10, bottom: 20, right: 8),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "Worldwide",
@@ -393,13 +368,15 @@ class _StatusScreenState extends State<StatusScreen> {
                           padding: const EdgeInsets.only(
                               bottom: 26, left: 10, right: 10),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
                                 children: [
-                                  Text(NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["todayCases"].toString())),
-
+                                  Text(
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]
+                                                  ["todayCases"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 20,
@@ -412,8 +389,9 @@ class _StatusScreenState extends State<StatusScreen> {
                                         fontWeight: FontWeight.w600,
                                       )),
                                   Text(
-                                      NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["cases"].toString())),
-
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]["cases"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 14,
@@ -422,8 +400,10 @@ class _StatusScreenState extends State<StatusScreen> {
                               ),
                               Column(
                                 children: [
-                                  Text(NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["active"].toString())),
-
+                                  Text(
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]["active"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 20,
@@ -435,9 +415,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       )),
-                                  Text(NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["recovered"].toString())),
-
-
+                                  Text(
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]["recovered"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 14,
@@ -447,9 +428,10 @@ class _StatusScreenState extends State<StatusScreen> {
                               Column(
                                 children: [
                                   Text(
-                                      NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["todayDeaths"].toString())),
-
-
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]
+                                                  ["todayDeaths"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 20,
@@ -461,8 +443,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       )),
-                                  Text(NumberFormat.decimalPattern().format(int.parse(WMapResponse[0]["deaths"].toString())),
-
+                                  Text(
+                                      NumberFormat.decimalPattern().format(
+                                          int.parse(WMapResponse[0]["deaths"]
+                                              .toString())),
                                       style: TextStyle(
                                         color: primaryText,
                                         fontSize: 14,
@@ -487,17 +471,16 @@ class _StatusScreenState extends State<StatusScreen> {
 
 class DistrictWeekChart extends StatelessWidget {
   final String state;
-  final Map mapResponseInCard;
   final String dateInString;
   final DateTime date;
   final String district;
 
-  const DistrictWeekChart({Key key,
-    this.state,
-    this.mapResponseInCard,
-    this.dateInString,
-    this.date,
-    this.district})
+  const DistrictWeekChart(
+      {Key key,
+      this.state,
+      this.dateInString,
+      this.date,
+      this.district})
       : super(key: key);
 
   @override
@@ -507,13 +490,25 @@ class DistrictWeekChart extends StatelessWidget {
         children: [
           AspectRatio(
               aspectRatio: 1.4,
-              child: BarChart(BarChartData(
-                  barGroups: getBarGroups(),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: SideTitles(showTitles: false),
-                    bottomTitles: SideTitles(showTitles: false),
-                  ))))
+              child: FutureBuilder(
+                  future: getBarGroups(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return BarChart(BarChartData(
+                          barGroups: snapshot.data,
+                          borderData: FlBorderData(show: false),
+                          titlesData: FlTitlesData(
+                            leftTitles: SideTitles(showTitles: false),
+                            bottomTitles: SideTitles(showTitles: false),
+                          )));
+
+                    }
+                    if(snapshot.hasError){
+                      return Text("fhj");
+                    }
+                    return Text("fdvn");;
+                  }
+              ))
         ],
       ),
     );
@@ -526,49 +521,40 @@ class DistrictWeekChart extends StatelessWidget {
     return outFormatter.format(pvDate);
   }
 
-  double getData(int y) {
-    if (mapResponseInCard == null)
-      return 0;
-    else if (mapResponseInCard['${previousDates(y)}'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']
-    ['districts'] ==
-        null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']['districts']
-    ['$district'] ==
-        null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']['districts']
-    ['$district']["delta"] ==
-        null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']['districts']
-    ['$district']["delta"]["confirmed"] ==
-        null) {
-      return 0;
-    } else
-      return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
-      ['districts']['$district']["delta"]["confirmed"]
-          .toString());
+
+
+  Future<double> getData(int y) async {
+    double _returnValue = 0;
+    await FirebaseFirestore.instance
+        .doc('${previousDates(y)}/$state/districts/$district')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['delta'] == null || data['delta']['confirmed'] == null
+            ? 0
+            : double.parse(data['delta']['confirmed'].toString());
+      }
+      else{
+        _returnValue =0;
+      }
+    });
+    return _returnValue;
   }
 
-  getBarGroups() {
+  Future<List<BarChartGroupData>>getBarGroups() async {
     List<double> barChartDatas = [
-      getData(6),
-      getData(5),
-      getData(4),
-      getData(3),
-      getData(2),
-      getData(1),
-      getData(0)
+      await getData(6),
+      await getData(5),
+      await getData(4),
+      await getData(3),
+      await getData(2),
+      await getData(1),
+      await getData(0)
     ];
     List<BarChartGroupData> barChartGroups = [];
     barChartDatas.asMap().forEach(
-            (i, value) =>
-            barChartGroups.add(BarChartGroupData(x: i, barRods: [
+        (i, value) => barChartGroups.add(BarChartGroupData(x: i, barRods: [
               BarChartRodData(y: value, colors: [primaryRed], width: 16)
             ])));
     return barChartGroups;
@@ -577,32 +563,43 @@ class DistrictWeekChart extends StatelessWidget {
 
 class StateChart extends StatelessWidget {
   final String state;
-  final Map mapResponseInCard;
   final String dateInString;
   final DateTime date;
 
-  const StateChart({Key key,
-    this.state,
-    this.mapResponseInCard,
-    this.date,
-    this.dateInString})
+  const StateChart(
+      {Key key,
+      this.state,
+      this.date,
+      this.dateInString})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return LineChart(LineChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        lineBarsData: [
-          LineChartBarData(
-              barWidth: 6,
-              colors: [primaryRed],
-              spots: getGraphData(),
-              isCurved: false,
-              dotData: FlDotData(show: false),
-              belowBarData: BarAreaData(show: false))
-        ]));
+    return FutureBuilder(
+        future: getGraphData(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return LineChart(LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                      barWidth: 6,
+                      colors: [primaryRed],
+                      spots: snapshot.data,
+                      isCurved: false,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false))
+                ]))
+            ;
+          }
+          if(snapshot.hasError){
+            return Text("fdj");
+          }
+          return Text("fdf");
+        }
+    );
   }
 
   String previousDates(int x) {
@@ -612,149 +609,213 @@ class StateChart extends StatelessWidget {
     return outFormatter.format(pvDate);
   }
 
-  double getData(int y) {
-    if (mapResponseInCard == null)
-      return 0;
-    else if (mapResponseInCard['${previousDates(y)}'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']["delta"] ==
-        null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']["delta"]
-    ["confirmed"] ==
-        null) {
-      return 0;
-    } else
-      return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
-      ["delta"]["confirmed"]
-          .toString());
+
+  Future<double> getData(int y) async {
+    double _returnValue = 0;
+    await FirebaseFirestore.instance
+        .doc('${previousDates(y)}/$state')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['delta'] == null || data['delta']['confirmed'] == null
+            ? 0
+            : double.parse(data['delta']['confirmed'].toString());
+      }
+      else{
+        _returnValue =0;
+      }
+    });
+    return _returnValue;
   }
 
-  List<FlSpot> getGraphData() {
+  Future<List<FlSpot>> getGraphData() async{
     return [
-      FlSpot(0, getData(29)),
-      FlSpot(1, getData(28)),
-      FlSpot(2, getData(27)),
-      FlSpot(3, getData(26)),
-      FlSpot(4, getData(25)),
-      FlSpot(5, getData(24)),
-      FlSpot(6, getData(23)),
-      FlSpot(7, getData(22)),
-      FlSpot(8, getData(21)),
-      FlSpot(9, getData(20)),
-      FlSpot(10, getData(19)),
-      FlSpot(11, getData(18)),
-      FlSpot(12, getData(17)),
-      FlSpot(13, getData(16)),
-      FlSpot(14, getData(15)),
-      FlSpot(15, getData(14)),
-      FlSpot(16, getData(13)),
-      FlSpot(17, getData(12)),
-      FlSpot(18, getData(11)),
-      FlSpot(19, getData(10)),
-      FlSpot(20, getData(9)),
-      FlSpot(21, getData(8)),
-      FlSpot(22, getData(7)),
-      FlSpot(23, getData(6)),
-      FlSpot(24, getData(5)),
-      FlSpot(25, getData(4)),
-      FlSpot(26, getData(3)),
-      FlSpot(27, getData(2)),
-      FlSpot(28, getData(1)),
-      FlSpot(29, getData(0)),
+      FlSpot(0, await getData(29)),
+      FlSpot(1, await getData(28)),
+      FlSpot(2, await getData(27)),
+      FlSpot(3, await getData(26)),
+      FlSpot(4, await getData(25)),
+      FlSpot(5, await getData(24)),
+      FlSpot(6, await getData(23)),
+      FlSpot(7, await getData(22)),
+      FlSpot(8, await getData(21)),
+      FlSpot(9, await getData(20)),
+      FlSpot(10, await getData(19)),
+      FlSpot(11, await getData(18)),
+      FlSpot(12, await getData(17)),
+      FlSpot(13, await getData(16)),
+      FlSpot(14, await getData(15)),
+      FlSpot(15, await getData(14)),
+      FlSpot(16, await getData(13)),
+      FlSpot(17, await getData(12)),
+      FlSpot(18, await getData(11)),
+      FlSpot(19, await getData(10)),
+      FlSpot(20, await getData(9)),
+      FlSpot(21, await getData(8)),
+      FlSpot(22, await getData(7)),
+      FlSpot(23, await getData(6)),
+      FlSpot(24, await getData(5)),
+      FlSpot(25, await getData(4)),
+      FlSpot(26, await getData(3)),
+      FlSpot(27, await getData(2)),
+      FlSpot(28, await getData(1)),
+      FlSpot(29, await getData(0)),
     ];
   }
+
 }
 
 class RowItem extends StatelessWidget {
   final Color txColor;
   final String item;
   final String txHeading;
-  final Map mapResponseInRow;
   final DateTime currentDate;
 
-  const RowItem({Key key, this.txColor, this.item, this.txHeading, this.mapResponseInRow, this.currentDate}) : super(key: key);
+  const RowItem(
+      {Key key,
+      this.txColor,
+      this.item,
+      this.txHeading,
+      this.currentDate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+    double maxWidth = MediaQuery.of(context).size.width;
     return Column(
-
       children: [
-        Text(
-
-
-            NumberFormat.decimalPattern().format(int.parse(finalNumber("delta"))),
+        FutureBuilder(
+            future: finalNumber("delta"),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(snapshot.data)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ));
+              }
+              if (snapshot.hasError) {
+                return Shimmer.fromColors(
+                  baseColor: shimmerbasecolor,
+                  highlightColor: shimmerhighlightcolor,
+                  child: Container(
+                    height: 20,
+                    width: maxWidth * 0.20,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              }
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  height: 20,
+                  width: maxWidth * 0.20,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }),
+        Text(txHeading,
             style: TextStyle(
-              color: primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        Text(txHeading,style: TextStyle(
-          color: txColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        )),
-        Text(
-            NumberFormat.decimalPattern().format(int.parse(finalNumber("total"))),
-
-
-            style: TextStyle(
-              color: primaryText,
+              color: txColor,
               fontSize: 14,
-
+              fontWeight: FontWeight.w600,
             )),
-
-
+        FutureBuilder(
+            future: finalNumber("total"),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(snapshot.data)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 14,
+                    ));
+              }
+              if (snapshot.hasError) {
+                return Shimmer.fromColors(
+                  baseColor: shimmerbasecolor,
+                  highlightColor: shimmerhighlightcolor,
+                  child: Container(
+                    height: 15,
+                    width: maxWidth * 0.20,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              }
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  height: 15,
+                  width: maxWidth * 0.20,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }),
       ],
     );
   }
-  String finalNumber(String deltaortotal){
+
+  Future<String> finalNumber(String deltaortotal) async {
+    String abc;
+
     DateTime _today = DateTime.now();
     String formatDate(DateTime day) {
       var outFormatter = new DateFormat('yyyy-MM-dd');
       return outFormatter.format(day);
     }
-    if(itemNumber(deltaortotal, formatDate(_today))=="0"){
-      if(itemNumber(deltaortotal, formatDate(_today.subtract(Duration(days:1))))=="0"){
-        return 0.toString();
 
+    if (await itemNumber(deltaortotal, formatDate(_today)) == "0") {
+      if (await itemNumber(
+              deltaortotal, formatDate(_today.subtract(Duration(days: 1)))) ==
+          "0") {
+        abc = 0.toString();
+      } else {
+        abc = await itemNumber(
+            deltaortotal, formatDate(_today.subtract(Duration(days: 1))));
       }
-      else{
-        return itemNumber(deltaortotal, formatDate(_today.subtract(Duration(days:1))));
-      }
-
+    } else {
+      abc = await itemNumber(deltaortotal, formatDate(_today));
     }
-    else{
-      return itemNumber(deltaortotal, formatDate(_today));
-    }
-
+    return abc;
   }
 
-  String itemNumber(String deltaortotal,String date) {
-    if(mapResponseInRow==null)
-      return 0.toString();
-    else if(mapResponseInRow['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-    ["$deltaortotal"]==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['TT']
-    ["$deltaortotal"]["$item"]==null){
-      return 0.toString();
-    }
-
-    else
-      return mapResponseInRow['$date']['TT']
-      ["$deltaortotal"]["$item"]
-          .toString();
-
+  Future<String> itemNumber(String deltaortotal, String date) async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('$date/TT/')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = (data == null ||
+                data['$deltaortotal'] == null ||
+                data['$deltaortotal']['$item'] == null)
+            ? 0.toString()
+            : _returnValue = data['$deltaortotal']['$item'].toString();
+      } else {
+        _returnValue = 0.toString();
+      }
+    });
+    return _returnValue;
   }
 }

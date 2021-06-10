@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/homeScreen.dart';
@@ -33,245 +34,265 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       return outFormatter.format(x);
     }
 
-    String getDistrictVaccinated(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] == null) {
-        return 0.toString();
 
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode'] == null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict'] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict']["total"] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict']["total"]["vaccinated2"] ==
-          null) {
-        return 0.toString();
-      } else {
-        return mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-                ['$userDistrict']["total"]["vaccinated2"]
-            .toString();
-      }
+    Future<String> getDistrictVaccinated( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/$userStateCode/districts/$userDistrict')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['total'] == null||data['total']['vaccinated2'] == null)?0.toString():_returnValue=data['total']['vaccinated2'].toString();
+
+
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
     }
 
 
-    String getDistricPopulation(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] == null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode'] == null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict'] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict']["meta"] ==
-          null) {
-        return 0.toString();
-      } else if (mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-              ['$userDistrict']["meta"]["population"] ==
-          null) {
-        return 0.toString();
-      } else {
-        return mapResponse['${formatDate(date)}']['$userStateCode']["districts"]
-                ['$userDistrict']["meta"]["population"]
-            .toString();
-      }
+
+    Future<String> getDistricPopulation( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/$userStateCode/districts/$userDistrict')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['meta'] == null||data['meta']['population'] == null)?0.toString():_returnValue=data['meta']['population'].toString();
+
+
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
     }
 
-    String getStateVaccinated(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] ==
-          null) {
-        return 0.toString();
-      }else if (mapResponse['${formatDate(date)}']['$userStateCode'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['$userStateCode']["total"] ==
-          null) {
-        return 0.toString();
-      }
+
+    Future<String> getStateVaccinated( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/$userStateCode')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['total'] == null||data['total']['vaccinated2'] == null)?0.toString():_returnValue=data['total']['vaccinated2'].toString();
 
 
-      else if (mapResponse['${formatDate(date)}']['$userStateCode']["total"]["vaccinated2"] ==
-          null) {
-        return 0.toString();
-      } else {
-        return mapResponse['${formatDate(date)}']['$userStateCode']["total"]["vaccinated2"]
-            .toString();
-      }
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
+    }
+    Future<String> getStatePopulation( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/$userStateCode')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['meta'] == null||data['meta']['population'] == null)?0.toString():_returnValue=data['meta']['population'].toString();
+
+
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
     }
 
-    String getStatePopulation(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['$userStateCode'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['$userStateCode']["meta"]==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['$userStateCode']["meta"]["population"] ==
-          null) {
-        return 0.toString();
-      }else {
-        return mapResponse['${formatDate(date)}']['$userStateCode']["meta"]["population"]
-            .toString();
-      }
+
+
+
+    Future<String> getIndiaVaccinated( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/TT')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['total'] == null||data['total']['vaccinated2'] == null)?0.toString():_returnValue=data['total']['vaccinated2'].toString();
+
+
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
+    }
+    Future<String> getIndiaPopulation( DateTime date) async{
+      String _returnValue="0";
+      await FirebaseFirestore.instance
+          .doc('${formatdate(date)}/TT')
+          .get().then((documentSnapshot) {
+        Map<String, dynamic> data = documentSnapshot.data();
+        if (documentSnapshot.exists) {
+          _returnValue=(data == null ||data['meta'] == null||data['meta']['population'] == null)?0.toString():_returnValue=data['meta']['population'].toString();
+
+
+        }
+        else{
+
+          _returnValue=0.toString();
+        }
+      });
+      return _returnValue;
     }
 
-    String getIndiaVaccinated(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['TT'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['TT']["total"]==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['TT']["total"]["vaccinated2"] ==
-          null) {
-        return 0.toString();
-      }else {
-        return mapResponse['${formatDate(date)}']['TT']["total"]["vaccinated2"]
-            .toString();
-      }
-    }
-
-    String getIndiaPopulation(DateTime date) {
-      if (mapResponse['${formatDate(date)}'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['TT'] ==
-          null) {
-        return 0.toString();
-      }
-      else if (mapResponse['${formatDate(date)}']['TT']["meta"] ==
-          null) {
-        return 0.toString();
-      }
-
-      else if (mapResponse['${formatDate(date)}']['TT']["meta"]["population"] ==
-          null) {
-        return 0.toString();
-      } else {
-        return mapResponse['${formatDate(date)}']['TT']["meta"]["population"]
-            .toString();
-      }
-    }
-
-    String peoplePercent(String gds){
+    Future<String> peoplePercent(String gds)async{
       if(gds=="getDistrictVaccinated"){
-        if(getDistrictVaccinated(_today)=="0"){
-          if(getDistrictVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+        if(await getDistrictVaccinated(_today)=="0"){
+          if(await getDistrictVaccinated(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getDistrictVaccinated(_today.subtract(Duration(days: 1)));
+            return await getDistrictVaccinated(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getDistrictVaccinated(_today);
+          return await getDistrictVaccinated(_today);
         }
       }
       if(gds=="getDistricPopulation"){
-        if(getDistricPopulation(_today)=="0"){
-          if(getDistricPopulation(_today.subtract(Duration(days: 1)))=="0"){
+        if(await getDistricPopulation(_today)=="0"){
+          if(await getDistricPopulation(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getDistricPopulation(_today.subtract(Duration(days: 1)));
+            return await getDistricPopulation(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getDistricPopulation(_today);
+          return await getDistricPopulation(_today);
         }
       }
       if(gds=="getStateVaccinated"){
-        if(getStateVaccinated(_today)=="0"){
-          if(getStateVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+        if(await getStateVaccinated(_today)=="0"){
+          if(await getStateVaccinated(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getStateVaccinated(_today.subtract(Duration(days: 1)));
+            return await getStateVaccinated(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getStateVaccinated(_today);
+          return await getStateVaccinated(_today);
         }
       }
       if(gds=="getStatePopulation"){
-        if(getStatePopulation(_today)=="0"){
-          if(getStatePopulation(_today.subtract(Duration(days: 1)))=="0"){
+        if(await getStatePopulation(_today)=="0"){
+          if(await getStatePopulation(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getStatePopulation(_today.subtract(Duration(days: 1)));
+            return await getStatePopulation(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getStatePopulation(_today);
+          return await getStatePopulation(_today);
         }
       }
       if(gds=="getIndiaVaccinated"){
-        if(getIndiaVaccinated(_today)=="0"){
-          if(getIndiaVaccinated(_today.subtract(Duration(days: 1)))=="0"){
+        if(await getIndiaVaccinated(_today)=="0"){
+          if(await getIndiaVaccinated(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getIndiaVaccinated(_today.subtract(Duration(days: 1)));
+            return await getIndiaVaccinated(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getIndiaVaccinated(_today);
+          return await getIndiaVaccinated(_today);
         }
       }
-      if(gds=="getIndiaPopulation"){
-        if(getIndiaPopulation(_today)=="0"){
-          if(getIndiaPopulation(_today.subtract(Duration(days: 1)))=="0"){
+      if( gds=="getIndiaPopulation"){
+        if(await getIndiaPopulation(_today)=="0"){
+          if(await getIndiaPopulation(_today.subtract(Duration(days: 1)))=="0"){
             return 0.toString();
           }
           else{
-            return getIndiaPopulation(_today.subtract(Duration(days: 1)));
+            return await getIndiaPopulation(_today.subtract(Duration(days: 1)));
           }
         }
         else{
-          return getIndiaPopulation(_today);
+          return await getIndiaPopulation(_today);
         }
       }
 
     }
 
-    int vaccinatedDistrict = int.parse(peoplePercent("getDistrictVaccinated"));
-    int populationDistrict = int.parse(peoplePercent("getDistricPopulation"));
-    double districtpercentage = vaccinatedDistrict==0||populationDistrict==0?0:(vaccinatedDistrict / populationDistrict);
 
-    int vaccinatedState = int.parse(peoplePercent("getStateVaccinated"));
-    int populationState = int.parse(peoplePercent("getStatePopulation"));
-    double statepercentage =  vaccinatedState==0||populationState==0?0:(vaccinatedState / populationState);
 
-    int vaccinatedIndia = int.parse(peoplePercent("getIndiaVaccinated"));
-    int populationIndia = int.parse(peoplePercent("getIndiaPopulation"));
-    double indiapercentage =  vaccinatedIndia==0||populationIndia==0?0:(vaccinatedIndia / populationIndia);
+    Future<double> getDistrictPercent() async{
+      double percent;
+      String vaccinated = await peoplePercent("getDistrictVaccinated");
+      int vaccinatedinInt = int.parse(vaccinated);
+      String population = await peoplePercent("getDistricPopulation");
+      int populationinInt = int.parse(population);
+      percent = vaccinatedinInt == 0 || populationinInt == 0 ? 0 : (vaccinatedinInt / populationinInt);
+      return percent;
+
+
+    }
+
+
+
+    Future<double> getStatePercent() async{
+      double percent;
+      String vaccinated = await peoplePercent("getStateVaccinated");
+      int vaccinatedinInt = int.parse(vaccinated);
+      String population = await peoplePercent("getStatePopulation");
+      int populationinInt = int.parse(population);
+      percent = vaccinatedinInt == 0 || populationinInt == 0 ? 0 : (vaccinatedinInt / populationinInt);
+      return percent;
+
+
+    }
+
+
+
+
+
+    Future<double> getIndiaPercent() async{
+      double percent;
+      String vaccinated = await peoplePercent("getIndiaVaccinated");
+      int vaccinatedinInt = int.parse(vaccinated);
+      String population = await peoplePercent("getIndiaPopulation");
+      int populationinInt = int.parse(population);
+      percent = vaccinatedinInt == 0 || populationinInt == 0 ? 0 : (vaccinatedinInt / populationinInt);
+      return percent;
+
+
+    }
+    Future<Map> distictData() async{
+      Map abc={"percent":await getDistrictPercent(),
+      "vaccinated":await peoplePercent("getDistrictVaccinated")};
+      return abc;
+    }
+    Future<Map> stateData() async{
+      Map abc={"percent":await getStatePercent(),
+        "vaccinated":await peoplePercent("getStateVaccinated")};
+      return abc;
+    }
+    Future<Map> indiaData() async{
+      Map abc={"percent":await getIndiaPercent(),
+        "vaccinated":await peoplePercent("getIndiaVaccinated")};
+      return abc;
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -285,35 +306,78 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(children: [
-                  PercentageCard(
-                    percentage: districtpercentage,
-                    name: "$userDistrict",
-                    totalVaccinated: peoplePercent("getDistrictVaccinated"),
-                    page: VaccinationDistrictScreen(
-                      state: "$userStateCode",
-                      district: "$userDistrict",
-                    ),
+                  FutureBuilder(
+                      future: distictData(),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return PercentageCard(
+                            percentage: snapshot.data["percent"],
+                            name: "$userDistrict",
+                            totalVaccinated: snapshot.data["vaccinated"],
+                            page: VaccinationDistrictScreen(
+                              state: "$userStateCode",
+                              district: "$userDistrict",
+                            ),
+                          )
+
+                          ;
+                        }
+                        if(snapshot.hasError){
+                          return Text("dfsdfs");
+                        }
+                        return Text("dfs");
+                      }
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  PercentageCard(
-                    percentage: statepercentage,
-                    totalVaccinated: peoplePercent("getStateVaccinated"),
-                    name: "$userState",
-                    page: VaccinationStateScreen(
-                      stateCode: "$userStateCode",
-                      stateName: "$userState",
-                    ),
+                  FutureBuilder(
+                      future: stateData(),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return PercentageCard(
+                            percentage: snapshot.data["percent"],
+                            totalVaccinated: snapshot.data["vaccinated"],
+                            name: "$userState",
+                            page: VaccinationStateScreen(
+                              stateCode: "$userStateCode",
+                              stateName: "$userState",
+                            ),
+                          )
+
+
+                          ;
+                        }
+                        if(snapshot.hasError){
+                          return Text("dfsdfs");
+                        }
+                        return Text("dfs");
+                      }
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  PercentageCard(
-                    percentage: indiapercentage,
-                    totalVaccinated: peoplePercent("getIndiaVaccinated"),
-                    name: "India",
-                    page: VaccinationIndiaScreen(),
+                  FutureBuilder(
+                      future: stateData(),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return PercentageCard(
+                            percentage: snapshot.data["percent"],
+                            totalVaccinated: snapshot.data["vaccinated"],
+
+                            name: "India",
+                            page: VaccinationIndiaScreen(),
+                          )
+
+
+
+                        ;
+                        }
+                        if(snapshot.hasError){
+                          return Text("dfsdfs");
+                        }
+                        return Text("dfs");
+                      }
                   ),
                   SizedBox(
                     height: 10,

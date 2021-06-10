@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/constants.dart';
 import 'package:covidapp/districtList.dart';
 import 'package:covidapp/main.dart';
@@ -226,13 +227,27 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
                                       fontSize: 18,
                                       color: primaryText),
                                 ),
-                                Text(
-                                  NumberFormat.decimalPattern().format(int.parse(getTotalVAC())),
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: primaryText,
-                                  fontWeight: FontWeight.bold),
+                                FutureBuilder(
+                                    future: getTotalVAC(),
+                                    builder: (context, snapshot) {
+                                      if(snapshot.hasData){
+                                        return Text(
+                                          NumberFormat.decimalPattern().format(int.parse(snapshot.data)),
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: primaryText,
+                                              fontWeight: FontWeight.bold),
 
+                                        )
+
+
+                                        ;
+                                      }
+                                      if(snapshot.hasError){
+                                        return Text("dfsdfs");
+                                      }
+                                      return Text("dfs");
+                                    }
                                 ),
                               ],
                             ),
@@ -245,7 +260,6 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
                           child: AspectRatio(
                               aspectRatio: 2,
                               child: StateChart(
-                                mapResponseInCard: mapResponse,
                                 state: widget.stateCode,
                                 dateInString: formatDate(),
                                 date: _selectedDay,
@@ -291,7 +305,6 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: new StateCard(date: formatDate(),
-                                mapResponse: mapResponse,
                                 state: widget.stateCode,
                                 district: getDistrictList()[index].districtName,
                                 onTap: (){
@@ -302,7 +315,7 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
 
 
 
-                                item: getDistrictList()[index].districtName,),
+                               ),
                             );
                           }
                       ),
@@ -319,33 +332,24 @@ class _VaccinationStateScreenState extends State<VaccinationStateScreen> {
     );
   }
 
-  String getTotalVAC() {
 
-     if(mapResponse
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponse['${formatDate()}']==null){
-      return 0.toString();
-    }
-    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
-    ==null){
-      return 0.toString();
-    }
-    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
-    ["total"]==null){
-      return 0.toString();
-    }
-    else if(mapResponse['${formatDate()}']['${widget.stateCode}']
-    ["total"]["vaccinated2"]==null){
-      return 0.toString();
-    }
-
-    else
-      return mapResponse['${formatDate()}']['${widget.stateCode}']
-      ["total"]["vaccinated2"]
-          .toString();
-
+  Future<String> getTotalVAC() async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('${formatDate()}/${widget.stateCode}')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['total'] == null || data['total']['vaccinated2'] == null
+            ? "0"
+            : data['total']['vaccinated2'].toString();
+      }
+      else{
+        _returnValue ="0";
+      }
+    });
+    return _returnValue;
   }
 
 }
@@ -357,11 +361,9 @@ class StateCard extends StatelessWidget {
   final String district;
   final String state;
   final VoidCallback onTap;
-  final String item;
   final bool selected;
   final String date;
-  final Map mapResponse;
-  const StateCard({Key key, this.district, this.onTap, this.item, this.selected, this.date, this.mapResponse, this.state}) : super(key: key);
+  const StateCard({Key key, this.district, this.onTap, this.selected, this.date, this.state}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -395,12 +397,27 @@ class StateCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Text(
-                      NumberFormat.decimalPattern().format(int.parse(itemNumber())),
+                    FutureBuilder(
+                        future: itemNumber(),
+                        builder: (context, snapshot) {
+                          if(snapshot.hasData){
+                            return Text(
+                              NumberFormat.decimalPattern().format(int.parse(snapshot.data)),
 
-                      style: null,
-                      textAlign: TextAlign.left,
-                    ),
+                              style: null,
+                              textAlign: TextAlign.left,
+                            )
+
+
+                            ;
+                          }
+                          if(snapshot.hasError){
+                            return Text("dfsdfs");
+                          }
+                          return Text("dfs");
+                        }
+                    )
+                    ,
                     Icon(Icons.arrow_forward_ios,color: primaryRed,size: 16,)
 
 
@@ -416,38 +433,25 @@ class StateCard extends StatelessWidget {
     );
   }
 
-  String itemNumber() {
-    if(mapResponse==null)
-      return 0.toString();
-    else if(mapResponse['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponse['$date']['$state']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponse['$date']['$state']
-    ['districts']==null){
-      return 0.toString();
-    }
-    else if(mapResponse['$date']['$state']
-    ['districts']['$district']==null){
-      return 0.toString();
-    }
-    else if(mapResponse['$date']['$state']
-    ['districts']['$district']["total"]==null){
-      return 0.toString();
-    }
-    else if(mapResponse['$date']['$state']
-    ['districts']['$district']["total"]["vaccinated2"]==null){
-      return 0.toString();
-    }
 
-    else
-      return mapResponse['$date']['$state']
-      ['districts']['$district']["total"]["vaccinated2"]
-          .toString();
 
+  Future<String> itemNumber() async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('$date/$state/districts/$district')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['total'] == null || data['total']['vaccinated2'] == null
+            ? "0"
+            : data['total']['vaccinated2'].toString();
+      }
+      else{
+        _returnValue ="0";
+      }
+    });
+    return _returnValue;
   }
 
 
@@ -455,33 +459,45 @@ class StateCard extends StatelessWidget {
 
 class StateChart extends StatelessWidget {
   final String state;
-  final Map mapResponseInCard;
   final String dateInString;
   final DateTime date;
 
   const StateChart(
       {Key key,
         this.state,
-        this.mapResponseInCard,
         this.date,
         this.dateInString})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return LineChart(LineChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        lineBarsData: [
-          LineChartBarData(
-              barWidth: 6,
-              colors: [primaryRed],
-              spots: getGraphData(),
-              isCurved: false,
-              dotData: FlDotData(show: false),
-              belowBarData: BarAreaData(show: false))
-        ]));
+    return FutureBuilder(
+        future: getGraphData(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return LineChart(LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                      barWidth: 6,
+                      colors: [primaryRed],
+                      spots: snapshot.data,
+                      isCurved: false,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false))
+                ]))
+
+
+            ;
+          }
+          if(snapshot.hasError){
+            return Text("dfsdfs");
+          }
+          return Text("dfs");
+        }
+    );
   }
 
   String previousDates(int x) {
@@ -491,58 +507,58 @@ class StateChart extends StatelessWidget {
     return outFormatter.format(pvDate);
   }
 
-  double getData(int y) {
-    if (mapResponseInCard == null)
-      return 0;
-    else if (mapResponseInCard['${previousDates(y)}'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state'] == null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']["total"] ==
-        null) {
-      return 0;
-    } else if (mapResponseInCard['${previousDates(y)}']['$state']["total"]
-    ["vaccinated2"] ==
-        null) {
-      return 0;
-    } else
-      return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
-      ["total"]["vaccinated2"]
-          .toString());
+
+  Future<double> getData(int y) async {
+    double _returnValue = 0;
+    await FirebaseFirestore.instance
+        .doc('${previousDates(y)}/$state')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['total'] == null || data['total']['vaccinated2'] == null
+            ? 0
+            : double.parse(data['total']['vaccinated2'].toString());
+      }
+      else{
+        _returnValue =0;
+      }
+    });
+    return _returnValue;
   }
 
-  List<FlSpot> getGraphData() {
+  Future<List<FlSpot>> getGraphData() async{
     return [
-      FlSpot(0, getData(29)),
-      FlSpot(1, getData(28)),
-      FlSpot(2, getData(27)),
-      FlSpot(3, getData(26)),
-      FlSpot(4, getData(25)),
-      FlSpot(5, getData(24)),
-      FlSpot(6, getData(23)),
-      FlSpot(7, getData(22)),
-      FlSpot(8, getData(21)),
-      FlSpot(9, getData(20)),
-      FlSpot(10, getData(19)),
-      FlSpot(11, getData(18)),
-      FlSpot(12, getData(17)),
-      FlSpot(13, getData(16)),
-      FlSpot(14, getData(15)),
-      FlSpot(15, getData(14)),
-      FlSpot(16, getData(13)),
-      FlSpot(17, getData(12)),
-      FlSpot(18, getData(11)),
-      FlSpot(19, getData(10)),
-      FlSpot(20, getData(9)),
-      FlSpot(21, getData(8)),
-      FlSpot(22, getData(7)),
-      FlSpot(23, getData(6)),
-      FlSpot(24, getData(5)),
-      FlSpot(25, getData(4)),
-      FlSpot(26, getData(3)),
-      FlSpot(27, getData(2)),
-      FlSpot(28, getData(1)),
-      FlSpot(29, getData(0)),
+      FlSpot(0, await getData(29)),
+      FlSpot(1, await getData(28)),
+      FlSpot(2, await getData(27)),
+      FlSpot(3, await getData(26)),
+      FlSpot(4, await getData(25)),
+      FlSpot(5, await getData(24)),
+      FlSpot(6, await getData(23)),
+      FlSpot(7, await getData(22)),
+      FlSpot(8, await getData(21)),
+      FlSpot(9, await getData(20)),
+      FlSpot(10, await getData(19)),
+      FlSpot(11, await getData(18)),
+      FlSpot(12, await getData(17)),
+      FlSpot(13, await getData(16)),
+      FlSpot(14, await getData(15)),
+      FlSpot(15, await getData(14)),
+      FlSpot(16, await getData(13)),
+      FlSpot(17, await getData(12)),
+      FlSpot(18, await getData(11)),
+      FlSpot(19, await getData(10)),
+      FlSpot(20, await getData(9)),
+      FlSpot(21, await getData(8)),
+      FlSpot(22, await getData(7)),
+      FlSpot(23, await getData(6)),
+      FlSpot(24, await getData(5)),
+      FlSpot(25, await getData(4)),
+      FlSpot(26, await getData(3)),
+      FlSpot(27, await getData(2)),
+      FlSpot(28, await getData(1)),
+      FlSpot(29, await getData(0)),
     ];
   }
 }

@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/main.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../constants.dart';
 import 'package:http/http.dart' as http;
@@ -88,7 +90,6 @@ class _DistrictScreenState extends State<DistrictScreen> {
             ),
             DataCard(
               district: widget.district,
-              mapResponseInCard: mapResponse,
               date: formatDate(),
               cardColor: cardYellow,
               graphColor: Color(0xFFC7971D),
@@ -99,7 +100,6 @@ class _DistrictScreenState extends State<DistrictScreen> {
             ),
             DataCard(
               district: widget.district,
-              mapResponseInCard: mapResponse,
               date: formatDate(),
               cardColor: cardGreen,
               graphColor: Color(0xFF27905D),
@@ -111,7 +111,6 @@ class _DistrictScreenState extends State<DistrictScreen> {
             ),
             DataCard(
               district: widget.district,
-              mapResponseInCard: mapResponse,
               date: formatDate(),
               graphColor: Color(0xFFA22C29),
               state: widget.state,
@@ -136,7 +135,6 @@ class DataCard extends StatelessWidget {
   final String cardHeading;
   final String district;
   final String state;
-  final Map mapResponseInCard;
   final String date;
   final DateTime currentDate;
 
@@ -145,7 +143,6 @@ class DataCard extends StatelessWidget {
       this.cardColor,
       this.cardHeading,
       this.district,
-      this.mapResponseInCard,
       this.date,
       this.item,
       this.currentDate,
@@ -187,15 +184,29 @@ class DataCard extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                      NumberFormat.decimalPattern().format(int.parse(itemNumber("delta")))
+                  child: FutureBuilder(
+                      future: itemNumber("delta"),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return Text(
+                              NumberFormat.decimalPattern().format(int.parse(snapshot.data))
 
-                      ,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                      )),
+                              ,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                              ))
+
+
+                          ;
+                        }
+                        if(snapshot.hasError){
+                          return Text("dfsdfs");
+                        }
+                        return Text("dfs");
+                      }
+                  ),
                 ),
               ),
               Expanded(
@@ -204,19 +215,31 @@ class DataCard extends StatelessWidget {
                   child: SizedBox(
                     width: double.infinity,
                     height: maxHeight*0.1,
-                    child: LineChart(LineChartData(
-                        gridData: FlGridData(show: false),
-                        titlesData: FlTitlesData(show: false),
-                        borderData: FlBorderData(show: false),
-                        lineBarsData: [
-                          LineChartBarData(
-                              barWidth: 6,
-                              colors: [graphColor],
-                              spots: getGraphData(),
-                              isCurved: false,
-                              dotData: FlDotData(show: false),
-                              belowBarData: BarAreaData(show: false))
-                        ])),
+                    child: FutureBuilder(
+                        future: getGraph(),
+                        builder: (context, snapshot) {
+                          if(snapshot.hasData){
+                            return LineChart(LineChartData(
+                                gridData: FlGridData(show: false),
+                                titlesData: FlTitlesData(show: false),
+                                borderData: FlBorderData(show: false),
+                                lineBarsData: [
+                                  LineChartBarData(
+                                      barWidth: 6,
+                                      colors: [graphColor],
+                                      spots: snapshot.data,
+                                      isCurved: false,
+                                      dotData: FlDotData(show: false),
+                                      belowBarData: BarAreaData(show: false))
+                                ]))
+                            ;
+                          }
+                          if(snapshot.hasError){
+                            return Text("dfsdfs");
+                          }
+                          return Text("dfs");
+                        }
+                    ),
                   ),
                 ),
               ),
@@ -236,14 +259,27 @@ class DataCard extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 8),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child:Text( NumberFormat.decimalPattern().format(int.parse(itemNumber("total")))
+                      child:FutureBuilder(
+                          future: itemNumber("total"),
+                          builder: (context, snapshot) {
+                            if(snapshot.hasData){
+                              return Text( NumberFormat.decimalPattern().format(int.parse(snapshot.data))
 
-                          ,
+                                  ,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 26,
                                     fontWeight: FontWeight.w500,
-                                  )),
+                                  ))
+
+                              ;
+                            }
+                            if(snapshot.hasError){
+                              return Text("dfsdfs");
+                            }
+                            return Text("dfs");
+                          }
+                      ),
                     ),
                   ),
                 ],
@@ -262,82 +298,62 @@ class DataCard extends StatelessWidget {
     return outFormatter.format(pvDate);
   }
 
-  double getData(int y) {
-    if(mapResponseInCard==null)
-      return 0;
-    else if(mapResponseInCard['${previousDates(y)}']==null){
-      return 0;
-    }
-    else if(mapResponseInCard['${previousDates(y)}']['$state']
-        ==null){
-      return 0;
-    }
-    else if(mapResponseInCard['${previousDates(y)}']['$state']
-    ['districts']==null){
-      return 0;
-    }
-    else if(mapResponseInCard['${previousDates(y)}']['$state']
-    ['districts']['$district']==null){
-      return 0;
-    }
-
-    else if(mapResponseInCard['${previousDates(y)}']['$state']
-    ['districts']['$district']["delta"]==null){
-      return 0;
-    }
-    else if(mapResponseInCard['${previousDates(y)}']['$state']
-    ['districts']['$district']["delta"]["$item"]==null){
-      return 0;
-    }
-
-    else
-      return double.parse(mapResponseInCard['${previousDates(y)}']['$state']
-      ['districts']['$district']["delta"]["$item"]
-          .toString());
-  }
-  String itemNumber(String deltaortotal) {
-    if(mapResponseInCard==null)
-      return 0.toString();
-    else if(mapResponseInCard['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInCard['$date']['$state']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponseInCard['$date']['$state']
-    ['districts']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInCard['$date']['$state']
-    ['districts']['$district']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInCard['$date']['$state']
-    ['districts']['$district']["$deltaortotal"]==null){
-      return 0.toString();
-    }
-    else if(mapResponseInCard['$date']['$state']
-    ['districts']['$district']["$deltaortotal"]["$item"]==null){
-      return 0.toString();
-    }
-
-    else
-      return mapResponseInCard['$date']['$state']
-      ['districts']['$district']["$deltaortotal"]["$item"]
-          .toString();
-
+  Future<double> graphgetValues(int y) async {
+    double _returnValue = 0;
+    await FirebaseFirestore.instance
+        .doc('${previousDates(y)}/$state/districts/$district')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['delta'] == null || data['delta']['$item'] == null
+            ? 0
+            : double.parse(data['delta']['$item'].toString());
+      }
+      else{
+        _returnValue =0;
+      }
+    });
+    return _returnValue;
   }
 
-  List<FlSpot> getGraphData() {
+  Future<List<FlSpot>> getGraph() async{
     return [
-      FlSpot(0, getData(6)),
-      FlSpot(1, getData(5)),
-      FlSpot(2, getData(4)),
-      FlSpot(3, getData(3)),
-      FlSpot(4, getData(2)),
-      FlSpot(5, getData(1)),
-      FlSpot(6, getData(0)),
+      FlSpot(0, await graphgetValues(6)),
+      FlSpot(1, await graphgetValues(5)),
+      FlSpot(2, await graphgetValues(4)),
+      FlSpot(3, await graphgetValues(3)),
+      FlSpot(4, await graphgetValues(2)),
+      FlSpot(5, await graphgetValues(1)),
+      FlSpot(6, await graphgetValues(0)),
     ];
   }
+
+
+
+
+
+
+
+
+  Future<String> itemNumber(String deltaortotal) async{
+    String _returnValue="0";
+    await FirebaseFirestore.instance
+        .doc('$date/$state/districts/$district')
+        .get().then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue=(data == null ||data['$deltaortotal'] == null||data['$deltaortotal']['$item'] == null)?0.toString():_returnValue=data['$deltaortotal']['$item'].toString();
+
+
+      }
+      else{
+
+        _returnValue=0.toString();
+      }
+    });
+    return _returnValue;
+  }
+
+
 }

@@ -32,7 +32,6 @@ class MyApp extends StatefulWidget {
 
 List WMapResponse;
 List WListResponse;
-Map mapResponse;
 bool download = false;
 
 class _MyAppState extends State<MyApp> {
@@ -41,18 +40,13 @@ class _MyAppState extends State<MyApp> {
     http.Response response2;
     var url2 = Uri.parse("https://coronavirus-19-api.herokuapp.com/countries");
     response2 = await http.get(url2);
-    http.Response response3;
-    var url3 =
-    Uri.parse("https://api.covid19india.org/v4/min/data-all.min.json");
-    response3 = await http.get(url3);
+
 
     print(response2.statusCode);
 
-    print(response3.statusCode);
-    if (response2.statusCode == 200 && response3.statusCode == 200) {
+    if (response2.statusCode == 200) {
       setState(() {
         WMapResponse = json.decode(response2.body);
-        mapResponse= json.decode(response3.body);
         download = true;
       });
     }

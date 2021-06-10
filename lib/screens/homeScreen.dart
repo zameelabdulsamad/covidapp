@@ -30,51 +30,13 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
 String userDistrict;
 String userState;
 String userDistrictCode;
 String userStateCode;
+bool firestoreDownload=false;
 DateTime _today = DateTime.now();
-
-//homeicfunctions
-
-String homeICGraphpreviousDates(int x) {
-  DateTime pvDate = _today.subtract(Duration(days: x));
-
-  var outFormatter = new DateFormat('yyyy-MM-dd');
-  return outFormatter.format(pvDate);
-}
-double homeICGraphgetValues(int y,String item){
-
-  FirebaseFirestore.instance
-      .collection('${homeICGraphpreviousDates(y)}')
-      .doc('$userStateCode').collection('districts').doc('$userDistrict')
-      .get()
-      .then((DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data = documentSnapshot.data();
-    if (documentSnapshot.exists) {
-
-      return data['delta']['$item']==null?0:double.parse(data['delta']['$item'].toString());
-
-
-    } else {
-      return 0;
-    }
-
-
-  });
-
-
-}
-
-
-
-
-
-
-
-//homeicfunctions
-
 
 String formatdate(DateTime date) {
   var outFormatter = new DateFormat('yyyy-MM-dd');
@@ -87,14 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return MobileAds.instance.initialize();
   }
 
+
+
   @override
   void initState() {
     userDistrict = UserPreferences().districtName;
     userState = UserPreferences().stateName;
     userDistrictCode = UserPreferences().districtCode;
     userStateCode = UserPreferences().stateCode;
-
-
 
     // TODO: implement initState
     super.initState();
@@ -104,18 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     double maxHeight = MediaQuery.of(context).size.height;
     double maxWidth = MediaQuery.of(context).size.width;
-    int tested;
-    int confirmed;
-    double tppercent;
-    void takeDatas() {
-      tested = int.parse(testpositivityData("tested"));
-      confirmed = int.parse(testpositivityData("confirmed"));
-      tppercent = tested == 0 || confirmed == 0 ? 0 : (confirmed / tested);
-    }
 
-    if (download == true) {
-      takeDatas();
-    }
+
+
+
 
     return Scaffold(
       appBar: buildAppBar(),
@@ -125,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               padding:
-                  EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
+              EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: bgGrey,
@@ -134,54 +88,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 8, bottom: 10),
-                    child: !download
-                        ? Container(
-                            width: maxWidth,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Shimmer.fromColors(
-                                  baseColor: shimmerbasecolor,
-                                  highlightColor: shimmerhighlightcolor,
-                                  child: Container(
-                                    height: 25,
-                                    width: maxWidth * 0.4,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChangeUserLocation()));
+                      },
+                      child: Container(
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: iconGrey,
+                              size: 28,
                             ),
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ChangeUserLocation()));
-                            },
-                            child: Container(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    color: iconGrey,
-                                    size: 28,
-                                  ),
-                                  Text(
-                                    userDistrict,
-                                    style: TextStyle(
-                                        color: primaryText,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                            Text(
+                              userDistrict,
+                              style: TextStyle(
+                                  color: primaryText,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                   Wrap(
                     runSpacing: 10,
@@ -191,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "Confirmed",
                         iconColor: coronaYellow,
                         today: _today,
+                        deltaortotal:"delta",
                         item: "confirmed",
                         homeInfoCardPage: DistrictScreen(
                           district: userDistrict,
@@ -200,8 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Deceased",
                         iconColor: coronaRed,
-                        today: _today,
+                        deltaortotal:"delta",
 
+                        today: _today,
                         item: "deceased",
                         homeInfoCardPage: DistrictScreen(
                           district: userDistrict,
@@ -211,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Recovered",
                         iconColor: coronaGreen,
+                        deltaortotal:"delta",
 
                         today: _today,
                         item: "recovered",
@@ -222,8 +157,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       HomeInfoCard(
                         title: "Vaccinated",
                         iconColor: coronaBlue,
-
                         today: _today,
+                        deltaortotal:"total",
+
                         item: "vaccinated2",
                         homeInfoCardPage: VaccinationDistrictScreen(
                           district: userDistrict,
@@ -251,6 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: "News",
                           buttonIcon: Icons.article,
                           homeButtonPage: NewsScreen()),
+
+
                       homeButton(
                         title: "Vaccination",
                         buttonIcon: Icons.medical_services_rounded,
@@ -263,28 +201,145 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  !download
-                      ? Shimmer.fromColors(
-                          baseColor: shimmerbasecolor,
-                          highlightColor: shimmerhighlightcolor,
-                          child: Container(
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          height: 200,
-                          decoration: BoxDecoration(
-                            color: bgGrey,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: bgGrey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   SizedBox(height: 10),
-                  !download
-                      ? Shimmer.fromColors(
+                  FutureBuilder(
+                      future: tpCard(),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return  GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => StateScreen(
+                                      stateName: userState,
+                                      stateCode: userStateCode,
+                                    )),
+                              );
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: bgGrey,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 16.0,
+                                          left: 10,
+                                          bottom: 8,
+                                          right: 8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Test Positivity",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: primaryText),
+                                              ),
+                                              Text(
+                                                userState,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: primaryText),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, bottom: 16, left: 16),
+                                              child: new CircularPercentIndicator(
+                                                radius: 110.0,
+                                                lineWidth: 30.0,
+                                                percent: snapshot.data["percent"],
+                                                center: new Text(
+                                                  "${(snapshot.data["percent"] * 100).toStringAsFixed(1)}%",
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      color: primaryText,
+                                                      fontSize: 12),
+                                                ),
+                                                progressColor: primaryRed,
+                                                backgroundColor: iconGrey,
+                                                circularStrokeCap:
+                                                CircularStrokeCap.butt,
+                                              ),
+
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  "Total Tested",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: primaryText),
+                                                ),
+                                                Text(
+                                                  NumberFormat.decimalPattern()
+                                                      .format(int.parse(
+                                                      snapshot.data["tested"])),
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: primaryText,
+                                                      fontWeight:
+                                                      FontWeight.bold),
+                                                )
+                                                ,
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                          )
+
+
+                          ;
+                        }
+                        if(snapshot.hasError){
+                          return Shimmer.fromColors(
+                            baseColor: shimmerbasecolor,
+                            highlightColor: shimmerhighlightcolor,
+                            child: Container(
+                              height: maxHeight * 0.2,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                        return Shimmer.fromColors(
                           baseColor: shimmerbasecolor,
                           highlightColor: shimmerhighlightcolor,
                           child: Container(
@@ -294,19 +349,25 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StateScreen(
-                                        stateName: userState,
-                                        stateCode: userStateCode,
-                                      )),
-                            );
-                          },
-                          child: Container(
+                        );
+                      }
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder(
+                      future: rowValue() ,
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData){
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => IndiaScreen()));
+                            },
+                            child: Container(
+                              width: double.infinity,
                               decoration: BoxDecoration(
                                 color: bgGrey,
                                 borderRadius: BorderRadius.circular(8),
@@ -315,183 +376,89 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        top: 16.0,
-                                        left: 10,
-                                        bottom: 8,
-                                        right: 8),
+                                        top: 16.0, left: 10, bottom: 20, right: 8),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Test Positivity",
+                                              "India",
                                               style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 22,
                                                   fontWeight: FontWeight.bold,
-                                                  color: primaryText),
-                                            ),
-                                            Text(
-                                              userState,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
                                                   color: primaryText),
                                             ),
                                           ],
                                         ),
+                                        Icon(Icons.arrow_right)
                                       ],
                                     ),
                                   ),
-                                  Container(
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 26, left: 10, right: 10),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 8, bottom: 16, left: 16),
-                                          child: new CircularPercentIndicator(
-                                            radius: 110.0,
-                                            lineWidth: 30.0,
-                                            percent: tppercent,
-                                            center: new Text(
-                                              "${(tppercent * 100).toStringAsFixed(1)}%",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: primaryText,
-                                                  fontSize: 12),
-                                            ),
-                                            progressColor: primaryRed,
-                                            backgroundColor: iconGrey,
-                                            circularStrokeCap:
-                                                CircularStrokeCap.butt,
-                                          ),
+                                        RowItem(
+                                          txColor: cardYellow,
+                                          txHeading: "CONFIRMED",
+                                          totalNumber: snapshot.data["totalconfirmed"],
+                                          deltaNumber: snapshot.data["deltaconfirmed"],
+
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "Total Tested",
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: primaryText),
-                                              ),
-                                              Text(
-                                                NumberFormat.decimalPattern()
-                                                    .format(int.parse(
-                                                        testpositivityData(
-                                                            "tested"))),
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: primaryText,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
+                                        RowItem(
+                                          txColor: cardGreen,
+                                          txHeading: "RECOVERED",
+                                          totalNumber: snapshot.data["totalrecovered"],
+                                          deltaNumber: snapshot.data["deltarecovered"],
+
+                                        ),
+                                        RowItem(
+                                          txColor: primaryRed,
+                                          txHeading: "DECEASED",
+                                          totalNumber: snapshot.data["totaldeceased"],
+                                          deltaNumber: snapshot.data["deltadeceased"],
                                         ),
                                       ],
                                     ),
                                   ),
                                 ],
-                              )),
-                        ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  !download
-                      ? Shimmer.fromColors(
+                              ),
+                            ),
+                          );
+
+
+                          ;
+                        }
+                        if(snapshot.hasError){
+                          return Shimmer.fromColors(
+                            baseColor: shimmerbasecolor,
+                            highlightColor: shimmerhighlightcolor,
+                            child: Container(
+                              height: maxHeight * 0.15,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                        return Shimmer.fromColors(
                           baseColor: shimmerbasecolor,
                           highlightColor: shimmerhighlightcolor,
                           child: Container(
-                            height: maxHeight * 0.2,
+                            height: maxHeight * 0.15,
                             decoration: BoxDecoration(
                               color: Colors.grey,
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => IndiaScreen()));
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: bgGrey,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 16.0,
-                                      left: 10,
-                                      bottom: 20,
-                                      right: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "India",
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: primaryText),
-                                          ),
-                                        ],
-                                      ),
-                                      Icon(Icons.arrow_right)
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 26, left: 10, right: 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      RowItem(
-                                        mapResponseInRow: mapResponse,
-                                        txColor: cardYellow,
-                                        txHeading: "CONFIRMED",
-                                        item: "confirmed",
-                                      ),
-                                      RowItem(
-                                        mapResponseInRow: mapResponse,
-                                        txColor: cardGreen,
-                                        txHeading: "RECOVERED",
-                                        item: "recovered",
-                                      ),
-                                      RowItem(
-                                        mapResponseInRow: mapResponse,
-                                        txColor: primaryRed,
-                                        txHeading: "DECEASED",
-                                        item: "deceased",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        );
+                      }
+                  ),
                 ],
               ),
             ),
@@ -521,36 +488,130 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String tpValues(String item, DateTime date) {
-    if (mapResponse == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatdate(date)}'] == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatdate(date)}']['$userStateCode'] == null) {
-      return 0.toString();
-    } else if (mapResponse['${formatdate(date)}']['$userStateCode']["delta"] ==
-        null) {
-      return 0.toString();
-    } else if (mapResponse['${formatdate(date)}']['$userStateCode']["delta"]
-            ["$item"] ==
-        null) {
-      return 0.toString();
-    } else
-      return mapResponse['${formatdate(date)}']['$userStateCode']["delta"]
-              ["$item"]
-          .toString();
+
+
+
+
+  Future<double> getPercent() async{
+    double percent;
+    String tested = await testpositivityData("tested");
+    int testedinInt = int.parse(tested);
+    String confirmed = await testpositivityData("confirmed");
+    int confirmedinInt = int.parse(confirmed);
+    percent = testedinInt == 0 || confirmedinInt == 0 ? 0 : (confirmedinInt / testedinInt);
+    return percent;
+
+
+  }
+  Future<Map> tpCard() async{
+    Map abc={"percent":await getPercent(),
+      "tested":await testpositivityData("tested")};
+    return abc;
   }
 
-  String testpositivityData(String item) {
-    if (tpValues(item, _today) == "0") {
-      if (tpValues(item, _today.subtract(Duration(days: 1))) == "0") {
-        return 0.toString();
+
+
+
+
+
+
+
+  Future<String> tpValues(String item, DateTime date) async{
+    String _returnValue="0";
+    await FirebaseFirestore.instance
+        .doc('${formatdate(date)}/$userStateCode')
+        .get().then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue=(data == null ||data['delta'] == null||data['delta']['$item'] == null)?0.toString():_returnValue=data['delta']['$item'].toString();
+
+
+      }
+      else{
+
+        _returnValue=0.toString();
+      }
+    });
+    return _returnValue;
+  }
+
+
+
+
+
+
+  Future<String> testpositivityData(String item) async{
+    String abc;
+
+    if (await tpValues(item, _today) == "0") {
+      if (await tpValues(item, _today.subtract(Duration(days: 1))) == "0") {
+        abc =  0.toString();
       } else {
-        return tpValues(item, _today.subtract(Duration(days: 1)));
+        abc =await  tpValues(item, _today.subtract(Duration(days: 1)));
       }
     } else {
-      return tpValues(item, _today);
+      abc = await tpValues(item, _today);
     }
+    return abc;
+  }
+
+  Future<Map> rowValue() async{
+    Map abc={
+      "deltaconfirmed":await finalNumber("delta", "confirmed"),
+      "totalconfirmed":await finalNumber("total", "confirmed"),
+      "deltarecovered":await finalNumber("delta", "recovered"),
+      "totalrecovered":await finalNumber("total", "recovered"),
+      "deltadeceased":await finalNumber("delta", "deceased"),
+      "totaldeceased":await finalNumber("total", "deceased"),
+
+    };
+    return abc;
+  }
+
+  Future<String> finalNumber(String deltaortotal,String item) async {
+    String abc;
+
+    DateTime _today = DateTime.now();
+    String formatDate(DateTime day) {
+      var outFormatter = new DateFormat('yyyy-MM-dd');
+      return outFormatter.format(day);
+    }
+
+    if (await itemNumber(deltaortotal, formatDate(_today),item) == "0") {
+      if (await itemNumber(
+          deltaortotal, formatDate(_today.subtract(Duration(days: 1))),item) ==
+          "0") {
+        abc=  0.toString();
+      } else {
+        abc= await itemNumber(
+            deltaortotal, formatDate(_today.subtract(Duration(days: 1))),item);
+      }
+    } else {
+      abc= await  itemNumber(deltaortotal, formatDate(_today),item);
+    }
+    return abc;
+  }
+
+
+
+
+  Future<String> itemNumber(String deltaortotal, String date,String item) async{
+    String _returnValue="0";
+    await FirebaseFirestore.instance
+        .doc('$date/TT/')
+        .get().then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue=(data == null ||data['$deltaortotal'] == null||data['$deltaortotal']['$item'] == null)?0.toString():_returnValue=data['$deltaortotal']['$item'].toString();
+
+
+      }
+      else{
+
+        _returnValue=0.toString();
+      }
+    });
+    return _returnValue;
   }
 }
 
@@ -570,53 +631,32 @@ class homeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        !download
-            ? Shimmer.fromColors(
-                baseColor: shimmerbasecolor,
-                highlightColor: shimmerhighlightcolor,
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  decoration:
-                      BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
-                ),
-              )
-            : GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => homeButtonPage),
-                  );
-                },
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  decoration:
-                      BoxDecoration(color: primaryRed, shape: BoxShape.circle),
-                  child: Icon(
-                    buttonIcon,
-                    size: 36,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+         GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => homeButtonPage),
+            );
+          },
+          child: Container(
+            height: 60,
+            width: 60,
+            decoration:
+            BoxDecoration(color: primaryRed, shape: BoxShape.circle),
+            child: Icon(
+              buttonIcon,
+              size: 36,
+              color: Colors.white,
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(top: 6),
-          child: !download
-              ? Shimmer.fromColors(
-                  baseColor: shimmerbasecolor,
-                  highlightColor: shimmerhighlightcolor,
-                  child: Container(
-                    width: 60,
-                    height: 10,
-                    color: Colors.grey,
-                  ),
-                )
-              : Text(
-                  title,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600, color: primaryText),
-                ),
+          child:  Text(
+            title,
+            style: TextStyle(
+                fontWeight: FontWeight.w600, color: primaryText),
+          ),
         )
       ],
     );
@@ -627,9 +667,9 @@ class HomeInfoCard extends StatelessWidget {
   final String title;
   final Color iconColor;
   final String item;
+  final String deltaortotal;
   final DateTime today;
   final Widget homeInfoCardPage;
-  final List<FlSpot> graph;
 
   const HomeInfoCard({
     Key key,
@@ -637,7 +677,7 @@ class HomeInfoCard extends StatelessWidget {
     this.iconColor,
     this.item,
     this.today,
-    this.homeInfoCardPage, this.graph,
+    this.homeInfoCardPage, this.deltaortotal,
   }) : super(key: key);
 
   String formatDate(DateTime date) {
@@ -647,12 +687,129 @@ class HomeInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     double maxHeight = MediaQuery.of(context).size.height;
     double maxWidth = MediaQuery.of(context).size.width;
     final curScaleFactor = MediaQuery.of(context).textScaleFactor;
     return LayoutBuilder(builder: (context, constraints) {
-      return !download
-          ? Shimmer.fromColors(
+      return  FutureBuilder(
+          future: homeIC(),
+          builder: (context, snapshot) {
+            if(snapshot.hasData){
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => homeInfoCardPage),
+                  );
+                },
+                child: Container(
+                  width: constraints.maxWidth / 2 - 10,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                  color: iconColor.withOpacity(0.12),
+                                  shape: BoxShape.circle),
+                              child: Icon(
+                                Icons.coronavirus_rounded,
+                                size: 18,
+                                color: iconColor,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              title,
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: 10.0, left: 10, right: 10),
+                              child: RichText(
+                                text: TextSpan(
+                                    style: TextStyle(color: primaryText),
+                                    children: [
+                                      TextSpan(
+                                          text:
+                                          "${NumberFormat.decimalPattern().format(int.parse(snapshot.data["data"]))}\n",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      TextSpan(
+                                          text: "People",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            height: 1,
+                                          ))
+                                    ]),
+                              ),
+                            ),
+                            Expanded(
+                                child: AspectRatio(
+                                  aspectRatio: 3,
+                                  child: LineChart(LineChartData(
+                                      gridData: FlGridData(show: false),
+                                      titlesData: FlTitlesData(show: false),
+                                      borderData: FlBorderData(show: false),
+                                      lineBarsData: [
+                                        LineChartBarData(
+                                            barWidth: 3,
+                                            colors: [primaryRed],
+                                            spots: snapshot.data["graph"],
+                                            isCurved: true,
+                                            dotData: FlDotData(show: false),
+                                            belowBarData:
+                                            BarAreaData(show: false))
+                                      ])),
+                                ))
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+
+
+
+            }
+            if(snapshot.hasError){
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  width: constraints.maxWidth / 2 - 10,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: SizedBox(height: maxHeight * 0.13),
+                ),
+              );
+            }
+            return Shimmer.fromColors(
               baseColor: shimmerbasecolor,
               highlightColor: shimmerhighlightcolor,
               child: Container(
@@ -663,217 +820,124 @@ class HomeInfoCard extends StatelessWidget {
                 ),
                 child: SizedBox(height: maxHeight * 0.13),
               ),
-            )
-          : GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => homeInfoCardPage),
-                );
-              },
-              child: Container(
-                width: constraints.maxWidth / 2 - 10,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                                color: iconColor.withOpacity(0.12),
-                                shape: BoxShape.circle),
-                            child: Icon(
-                              Icons.coronavirus_rounded,
-                              size: 18,
-                              color: iconColor,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            title,
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 10.0, left: 10, right: 10),
-                            child: FutureBuilder<DocumentSnapshot>(
-                              future: FirebaseFirestore.instance
-                                  .collection('${formatDate(today)}')
-                                  .doc('$userStateCode')
-                                  .collection('districts')
-                                  .doc('$userDistrict')
-                                  .get(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-
-                                if (snapshot.hasData && !snapshot.data.exists) {
-                                  return FutureBuilder<DocumentSnapshot>(
-                                    future: FirebaseFirestore.instance
-                                        .collection('${formatDate(today.subtract(Duration(days: 1)))}')
-                                        .doc('$userStateCode')
-                                        .collection('districts')
-                                        .doc('$userDistrict')
-                                        .get(),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-
-                                      if (snapshot.hasData && !snapshot.data.exists) {
-                                        return Text("0");
-                                      }
-
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.done) {
-                                        Map<String, dynamic> data =
-                                        snapshot.data.data();
-                                        return RichText(
-                                          text: TextSpan(
-                                              style: TextStyle(color: primaryText),
-                                              children: [
-                                                TextSpan(
-                                                    text:data['delta']['$item']==null?"0\n":
-                                                    "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.bold)),
-                                                TextSpan(
-                                                    text: "People",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      height: 1,
-                                                    ))
-                                              ]),
-                                        );
-                                      }
-
-                                      return Text("loading");
-                                    },
-                                  );
-                                }
-
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  Map<String, dynamic> data =
-                                      snapshot.data.data();
-                                  return RichText(
-                                    text: TextSpan(
-                                        style: TextStyle(color: primaryText),
-                                        children: [
-                                          TextSpan(
-                                              text:data['delta']['$item']==null?"0":
-                                              "${NumberFormat.decimalPattern().format(int.parse(data['delta']['$item'].toString()))}\n",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          TextSpan(
-                                              text: "People",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                height: 1,
-                                              ))
-                                        ]),
-                                  );
-                                }
-
-                                return Text("loading");
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: AspectRatio(
-                                aspectRatio: 3,
-                                child: LineChart(LineChartData(
-                                    gridData: FlGridData(show: false),
-                                    titlesData: FlTitlesData(show: false),
-                                    borderData: FlBorderData(show: false),
-                                    lineBarsData: [
-                                      LineChartBarData(
-                                          barWidth: 3,
-                                          colors: [primaryRed],
-                                          spots: getGraph(),
-                                          isCurved: true,
-                                          dotData: FlDotData(show: false),
-                                          belowBarData:
-                                              BarAreaData(show: false))
-                                    ]))),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
             );
+          }
+      );
     });
   }
 
-  List<FlSpot> getGraph() {
+  String previousDates(int x) {
+    DateTime pvDate = _today.subtract(Duration(days: x));
+
+    var outFormatter = new DateFormat('yyyy-MM-dd');
+    return outFormatter.format(pvDate);
+  }
+  Future<Map> homeIC() async{
+    Map abc={"graph":await getGraph(),
+      "data":await numberOfPeople()};
+    return abc;
+  }
+
+  Future<double> graphgetValues(int y, String item) async {
+    double _returnValue = 0;
+    await FirebaseFirestore.instance
+        .doc('${previousDates(y)}/$userStateCode/districts/$userDistrict')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = data == null || data['$deltaortotal'] == null || data['$deltaortotal']['$item'] == null
+            ? 0
+            : double.parse(data['$deltaortotal']['$item'].toString());
+      }
+      else{
+        _returnValue =0;
+      }
+    });
+    return _returnValue;
+  }
+
+  Future<List<FlSpot>> getGraph() async{
     return [
-      FlSpot(0, homeICGraphgetValues(6,"$item")),
-      FlSpot(1, homeICGraphgetValues(5,"$item")),
-      FlSpot(2, homeICGraphgetValues(4,"$item")),
-      FlSpot(3, homeICGraphgetValues(3,"$item")),
-      FlSpot(4, homeICGraphgetValues(2,"$item")),
-      FlSpot(5, homeICGraphgetValues(1,"$item")),
-      FlSpot(6, homeICGraphgetValues(0,"$item")),
+      FlSpot(0, await graphgetValues(6, "$item")),
+      FlSpot(1, await graphgetValues(5, "$item")),
+      FlSpot(2, await graphgetValues(4, "$item")),
+      FlSpot(3, await graphgetValues(3, "$item")),
+      FlSpot(4, await graphgetValues(2, "$item")),
+      FlSpot(5, await graphgetValues(1, "$item")),
+      FlSpot(6, await graphgetValues(0, "$item")),
     ];
   }
 
 
 
+  Future<String> numberOfPeople() async{
+    String abc;
+    if (await itemNumber(today) == "0") {
+      if (await itemNumber(today.subtract(Duration(days: 1))) == "0") {
 
+        abc= "0";
+      } else {
+        abc= await   itemNumber(today.subtract(Duration(days: 1)));
+
+      }
+    } else {
+      abc= await  itemNumber(today);
+
+    }
+    return abc;
+  }
+
+  Future<String> itemNumber(DateTime date) async{
+    String _returnValue="0";
+    await FirebaseFirestore.instance
+        .doc('${formatDate(date)}/$userStateCode/districts/$userDistrict')
+        .get().then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue=(data == null ||data['$deltaortotal'] == null||data['$deltaortotal']['$item'] == null)?0.toString():_returnValue=data['$deltaortotal']['$item'].toString();
+
+
+      }
+      else{
+
+        _returnValue=0.toString();
+      }
+    });
+    return _returnValue;
+  }
 
 
 }
 
 class RowItem extends StatelessWidget {
   final Color txColor;
-  final String item;
   final String txHeading;
-  final Map mapResponseInRow;
+  final String totalNumber;
+  final String deltaNumber;
   final DateTime currentDate;
 
   const RowItem(
       {Key key,
-      this.txColor,
-      this.item,
-      this.txHeading,
-      this.mapResponseInRow,
-      this.currentDate})
+        this.txColor,
+        this.txHeading,
+        this.currentDate, this.totalNumber, this.deltaNumber})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+    double maxWidth = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Text(
-            NumberFormat.decimalPattern()
-                .format(int.parse(finalNumber("delta"))),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(deltaNumber)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    )),
         Text(txHeading,
             style: TextStyle(
               color: txColor,
@@ -881,51 +945,18 @@ class RowItem extends StatelessWidget {
               fontWeight: FontWeight.w600,
             )),
         Text(
-            NumberFormat.decimalPattern()
-                .format(int.parse(finalNumber("total"))),
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 14,
-            )),
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(totalNumber)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 14,
+                    ))
+                ,
       ],
     );
   }
 
-  String finalNumber(String deltaortotal) {
-    DateTime _today = DateTime.now();
-    String formatDate(DateTime day) {
-      var outFormatter = new DateFormat('yyyy-MM-dd');
-      return outFormatter.format(day);
-    }
 
-    if (itemNumber(deltaortotal, formatDate(_today)) == "0") {
-      if (itemNumber(
-              deltaortotal, formatDate(_today.subtract(Duration(days: 1)))) ==
-          "0") {
-        return 0.toString();
-      } else {
-        return itemNumber(
-            deltaortotal, formatDate(_today.subtract(Duration(days: 1))));
-      }
-    } else {
-      return itemNumber(deltaortotal, formatDate(_today));
-    }
-  }
-
-  String itemNumber(String deltaortotal, String date) {
-    if (mapResponseInRow == null)
-      return 0.toString();
-    else if (mapResponseInRow['$date'] == null) {
-      return 0.toString();
-    } else if (mapResponseInRow['$date']['TT'] == null) {
-      return 0.toString();
-    } else if (mapResponseInRow['$date']['TT']["$deltaortotal"] == null) {
-      return 0.toString();
-    } else if (mapResponseInRow['$date']['TT']["$deltaortotal"]["$item"] ==
-        null) {
-      return 0.toString();
-    } else
-      return mapResponseInRow['$date']['TT']["$deltaortotal"]["$item"]
-          .toString();
-  }
 }
+
+

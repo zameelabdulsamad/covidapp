@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covidapp/main.dart';
 import 'package:covidapp/screens/stateScreen.dart';
 import 'package:covidapp/statesList.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../constants.dart';
@@ -23,10 +25,6 @@ class _IndiaScreenState extends State<IndiaScreen> {
     return outFormatter.format(_selectedDay);
   }
 
-
-
-
-
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
@@ -41,7 +39,6 @@ class _IndiaScreenState extends State<IndiaScreen> {
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-
         child: Column(
           children: [
             Container(
@@ -99,30 +96,29 @@ class _IndiaScreenState extends State<IndiaScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       RowItem(
-                        mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: cardYellow,
                         state: "TT",
                         txHeading: "CONFIRMED",
                         item: "confirmed",
-                        currentDate: _selectedDay,),
+                        currentDate: _selectedDay,
+                      ),
                       RowItem(
-                        mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: cardGreen,
                         state: "TT",
                         txHeading: "RECOVERED",
                         item: "recovered",
-                        currentDate: _selectedDay,),
+                        currentDate: _selectedDay,
+                      ),
                       RowItem(
-                        mapResponseInRow: mapResponse,
                         date: formatDate(),
                         txColor: primaryRed,
                         state: "TT",
                         txHeading: "DECEASED",
                         item: "deceased",
-                        currentDate: _selectedDay,),
-
+                        currentDate: _selectedDay,
+                      ),
                     ],
                   ),
                 ),
@@ -140,15 +136,19 @@ class _IndiaScreenState extends State<IndiaScreen> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 15,left: 20,right: 15,bottom: 10),
+                        padding: const EdgeInsets.only(
+                            top: 15, left: 20, right: 15, bottom: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("State",style: TextStyle(fontWeight: FontWeight.bold),),
-                            Text("Confirmed",style: TextStyle(fontWeight: FontWeight.bold),),
-
-
-
+                            Text(
+                              "State",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "Confirmed",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                       ),
@@ -161,7 +161,6 @@ class _IndiaScreenState extends State<IndiaScreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: new StateCard(
                                 date: formatDate(),
-                                mapResponse: mapResponse,
                                 state: stateList[index],
                                 onTap: () {
                                   Navigator.push(
@@ -194,7 +193,6 @@ class StateCard extends StatelessWidget {
   final StateList item;
   final bool selected;
   final String date;
-  final Map mapResponse;
 
   const StateCard(
       {Key key,
@@ -203,7 +201,7 @@ class StateCard extends StatelessWidget {
       this.item,
       this.selected,
       this.date,
-      this.mapResponse})
+    })
       : super(key: key);
 
   @override
@@ -233,13 +231,24 @@ class StateCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
+                    FutureBuilder(
+                        future: itemNumber(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              NumberFormat.decimalPattern()
+                                  .format(int.parse(snapshot.data)),
+                              style: null,
+                              textAlign: TextAlign.left,
+                            )
 
-                      Text(NumberFormat.decimalPattern()
-                          .format(int.parse(itemNumber())),
-
-                      style: null,
-                      textAlign: TextAlign.left,
-                    ),
+                            ;
+                          }
+                          if (snapshot.hasError) {
+                            return Text("dfsdfs");
+                          }
+                          return Text("dfs");
+                        }),
                     Icon(
                       Icons.arrow_forward_ios,
                       color: primaryRed,
@@ -254,22 +263,26 @@ class StateCard extends StatelessWidget {
     );
   }
 
-  String itemNumber() {
-    if (mapResponse == null)
-      return 0.toString();
-    else if (mapResponse['$date'] == null) {
-      return 0.toString();
-    } else if (mapResponse['$date']['${state.stateCode}'] == null) {
-      return 0.toString();
-    } else if (mapResponse['$date']['${state.stateCode}']["delta"] == null) {
-      return 0.toString();
-    } else if (mapResponse['$date']['${state.stateCode}']["delta"]
-            ["confirmed"] ==
-        null) {
-      return 0.toString();
-    } else
-      return mapResponse['$date']['${state.stateCode}']["delta"]["confirmed"]
-          .toString();
+
+
+  Future<String> itemNumber() async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('$date/${state.stateCode}')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = (data == null ||
+            data['delta'] == null ||
+            data['delta']['confirmed'] == null)
+            ? 0.toString()
+            : _returnValue = data['delta']['confirmed'].toString();
+      } else {
+        _returnValue = 0.toString();
+      }
+    });
+    return _returnValue;
   }
 }
 
@@ -278,70 +291,131 @@ class RowItem extends StatelessWidget {
   final String item;
   final String txHeading;
   final String state;
-  final Map mapResponseInRow;
   final String date;
   final DateTime currentDate;
 
-  const RowItem({Key key, this.txColor, this.item, this.txHeading, this.state, this.mapResponseInRow, this.date, this.currentDate}) : super(key: key);
+  const RowItem(
+      {Key key,
+      this.txColor,
+      this.item,
+      this.txHeading,
+      this.state,
+      this.date,
+      this.currentDate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double maxHeight = MediaQuery.of(context).size.height;
+    double maxWidth = MediaQuery.of(context).size.width;
     return Column(
-
       children: [
-        Text(
-
-
-            NumberFormat.decimalPattern().format(int.parse(itemNumber("delta"))),
+        FutureBuilder(
+            future: itemNumber("delta"),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(snapshot.data)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ));
+              }
+              if (snapshot.hasError) {
+                return Shimmer.fromColors(
+                  baseColor: shimmerbasecolor,
+                  highlightColor: shimmerhighlightcolor,
+                  child: Container(
+                    height: 20,
+                    width: maxWidth * 0.20,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              }
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  height: 20,
+                  width: maxWidth * 0.20,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }),
+        Text(txHeading,
             style: TextStyle(
-              color: primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        Text(txHeading,style: TextStyle(
-          color: txColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        )),
-        Text(
-            NumberFormat.decimalPattern().format(int.parse(itemNumber("total"))),
-
-
-            style: TextStyle(
-              color: primaryText,
+              color: txColor,
               fontSize: 14,
-
+              fontWeight: FontWeight.w600,
             )),
-
-
+        FutureBuilder(
+            future: itemNumber("total"),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                    NumberFormat.decimalPattern()
+                        .format(int.parse(snapshot.data)),
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: 14,
+                    ));
+              }
+              if (snapshot.hasError) {
+                return Shimmer.fromColors(
+                  baseColor: shimmerbasecolor,
+                  highlightColor: shimmerhighlightcolor,
+                  child: Container(
+                    height: 15,
+                    width: maxWidth * 0.20,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              }
+              return Shimmer.fromColors(
+                baseColor: shimmerbasecolor,
+                highlightColor: shimmerhighlightcolor,
+                child: Container(
+                  height: 15,
+                  width: maxWidth * 0.20,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }),
       ],
     );
   }
 
-  String itemNumber(String deltaortotal) {
-    if(mapResponseInRow==null)
-      return 0.toString();
-    else if(mapResponseInRow['$date']==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-        ==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-    ["$deltaortotal"]==null){
-      return 0.toString();
-    }
-    else if(mapResponseInRow['$date']['$state']
-    ["$deltaortotal"]["$item"]==null){
-      return 0.toString();
-    }
-
-    else
-      return mapResponseInRow['$date']['$state']
-      ["$deltaortotal"]["$item"]
-          .toString();
-
+  Future<String> itemNumber(String deltaortotal) async {
+    String _returnValue = "0";
+    await FirebaseFirestore.instance
+        .doc('$date/state/')
+        .get()
+        .then((documentSnapshot) {
+      Map<String, dynamic> data = documentSnapshot.data();
+      if (documentSnapshot.exists) {
+        _returnValue = (data == null ||
+                data['$deltaortotal'] == null ||
+                data['$deltaortotal']['$item'] == null)
+            ? 0.toString()
+            : _returnValue = data['$deltaortotal']['$item'].toString();
+      } else {
+        _returnValue = 0.toString();
+      }
+    });
+    return _returnValue;
   }
 }
-
