@@ -402,7 +402,7 @@ class RowItem extends StatelessWidget {
   Future<String> itemNumber(String deltaortotal) async {
     String _returnValue = "0";
     await FirebaseFirestore.instance
-        .doc('$date/state/')
+        .doc('$date/$state')
         .get()
         .then((documentSnapshot) {
       Map<String, dynamic> data = documentSnapshot.data();
